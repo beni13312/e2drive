@@ -1,0 +1,8 @@
+{
+  "name": "e2drive",
+  "private": true,
+  "workspaces": [
+    "api",
+    "web"
+  ]
+}

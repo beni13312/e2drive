@@ -1,5 +1,5 @@
 ## E2Drive
-![e2drive.png](e2drive.png)
+![e2drive.png](e2drive.png) \
 E2Drive is a fully end-to-end encrypted file storing web application.
 
 ## Features
