@@ -9,11 +9,14 @@
   },
   "dependencies": {
     "express": "^5.2.1",
-    "postgres": "^3.4.9"
+    "postgres": "^3.4.9",
+    "argon2": "^0.45.1",
+    "cors": "^2.8.6"
   },
   "devDependencies": {
     "@types/node": "^24.13.3",
     "@types/express": "^5.0.6",
+    "@types/cors":"^2.8.19",
     "tsx": "^4.23.15",
     "oxlint": "^1.81.0",
     "typescript": "~6.0.2"
