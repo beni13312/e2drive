@@ -1,6 +1,6 @@
 import Files from "../components/Files.tsx";
 
-function Dashboard(){
+function PersonalFiles(){
     return (
         <div className="dashboard">
             <header className="header shadow-[0_4px_8px_rgba(0,0,0,0.15)]" >
@@ -14,4 +14,4 @@ function Dashboard(){
         </div>
     )
 }
-export default Dashboard;
+export default PersonalFiles;
