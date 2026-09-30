@@ -28,4 +28,5 @@ body {
     background-color: var(--color-app-bg);
     color: var(--color-app-text);
     transition: background-color 0.2s ease, color 0.2s ease;
+    user-select: none;
 }
