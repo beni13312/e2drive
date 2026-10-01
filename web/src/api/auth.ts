@@ -9,20 +9,23 @@ export async function login(email: string, password: string) {
             "X-CSRF-Token": ""
         }
     }).then((res)=>{
-        return res.data.error;
+        return res.data;
     }).catch((error) => {
-        console.log(error);
+        console.log(error.response);
+        return error.response.data;
     });
 }
 
-export async function getCurrentUser() {
+export async function validateSession() {
     return await api.get("/api/auth/validate", {
         headers:{
             "X-CSRF-Token": ""
         }
     }).then((res)=>{
-        return res.data.error;
+        return !!res.data?.validate;
+
     }).catch((error) => {
-        console.log(error);
+        console.log(error.response);
+        return false;
     });
 }

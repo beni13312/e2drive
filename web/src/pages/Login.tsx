@@ -1,13 +1,24 @@
-import {login, getCurrentUser} from "../api/auth.ts";
+import {login, validateSession} from "../api/auth.ts";
 import {type FormEvent, useState, useEffect} from "react";
+import {useNavigate} from "react-router-dom";
 
 function Login(){
+    const navigate = useNavigate();
+
+    const [isValidSession, setIsValidSession] = useState(false);
+
     useEffect(()=>{
         const effect = async ()=>{
-            console.log(await getCurrentUser());
+            setIsValidSession(await validateSession());
+            console.log("valid session: " + isValidSession);
         };
         effect();
     }, []);
+
+    // if user authenticated already, navigate to files
+    if(isValidSession){
+        navigate("/files");
+    }
 
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
@@ -15,7 +26,12 @@ function Login(){
 
     const handleSubmit = async (e: FormEvent) => {
         e.preventDefault();
-        setErrorMsg(await login(email, password));
+        const loginResponse = await login(email, password);
+        if (loginResponse.login){
+            navigate("/files");
+        }else{
+            setErrorMsg(loginResponse.error);
+        }
     }
 
     return (
