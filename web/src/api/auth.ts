@@ -5,9 +5,6 @@ export async function login(email: string, password: string) {
         email: email,
         password: password,
     }, {
-        headers:{
-            "X-CSRF-Token": ""
-        }
     }).then((res)=>{
         return res.data;
     }).catch((error) => {
@@ -18,9 +15,6 @@ export async function login(email: string, password: string) {
 
 export async function validateSession() {
     return await api.get("/api/auth/validate", {
-        headers:{
-            "X-CSRF-Token": ""
-        }
     }).then((res)=>{
         return !!res.data?.validate;
 

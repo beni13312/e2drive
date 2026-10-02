@@ -5,20 +5,21 @@ import {useNavigate} from "react-router-dom";
 function Login(){
     const navigate = useNavigate();
 
-    const [isValidSession, setIsValidSession] = useState(false);
-
+    // check session
     useEffect(()=>{
         const effect = async ()=>{
-            setIsValidSession(await validateSession());
-            console.log("valid session: " + isValidSession);
+            const sessionCheck = await validateSession()
+            console.log("valid session: " + sessionCheck);
+            // if user authenticated already, navigate to files
+            if(sessionCheck){
+                navigate("/files");
+            }
         };
-        effect();
-    }, []);
 
-    // if user authenticated already, navigate to files
-    if(isValidSession){
-        navigate("/files");
-    }
+        effect();
+    }, [navigate]);
+
+
 
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
