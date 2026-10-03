@@ -30,7 +30,8 @@ router.post("/login", async (req, res) => {
                 httpOnly: true,
                 secure: true,
                 sameSite: "lax",
-                maxAge: Config.SESSION_EXPIRES
+                maxAge: Config.SESSION_EXPIRES,
+                path: '/'
             });
 
             const currentDate = new Date();
@@ -53,6 +54,31 @@ router.post("/login", async (req, res) => {
     }
 
 });
+
+router.get("/logout", async (req, res) => {
+    try{
+        const cookie = req.headers.cookie || "";
+        if(cookie == ""){
+            return res.status(401).json({error: "Not logged in"});
+        }
+
+        const sessionToken = cookie.split('=')[1];
+        const sessionTokenHash = crypto.hash("sha256", sessionToken);
+
+        const result = await db()`DELETE FROM sessions WHERE token=${sessionTokenHash}`;
+
+        return res.status(200).cookie("session","",{
+            httpOnly: true,
+            secure: true,
+            sameSite: "lax",
+            expires: new Date(0),
+            path: '/'
+        }).json({logout: true});
+
+    }catch (error){
+        return res.status(500).json({error: "Failed to destroy session"});
+    }
+})
 
 router.get("/validate", async (req,res)=>{
     try{
