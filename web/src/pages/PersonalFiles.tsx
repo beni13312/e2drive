@@ -92,8 +92,8 @@ function PersonalFiles(){
             {
                 !isLoaded && <Loading />
             }
-            <div className={`dashboard ${isLoaded ? "block" : "hidden"}`}>
-                    <header className="header shadow-[0_4px_8px_rgba(0,0,0,0.15)]" >
+            <div className={`dashboard ${isLoaded ? "flex" : "hidden"} h-dvh flex-col overflow-hidden`}>
+                    <header className="header shrink-0 shadow-[0_4px_8px_rgba(0,0,0,0.15)]" >
                         <ul className="list-none ml-5 mr-5 flex">
                             <li className="logo flex w-15">
                                 <img src="../../src/assets/logo.png" alt="logo"/>
@@ -117,11 +117,13 @@ function PersonalFiles(){
                             </li>
                         </ul>
                     </header>
-                    <main onContextMenu={(e) =>{handleRightClickMenu(e)}} className="main h-screen w-full">
-                       <Files onReady={()=> {setIsLoaded(true)}} />
-                        {
-                            rightClickMenu.visible && <RightClickMenu onRef={rightClickMenuRef} posX={rightClickMenu.x} posY={rightClickMenu.y}/>
-                        }
+                    <main className="main w-full min-h-0 flex-1 mb-10">
+                        <div className="files-container h-full overflow-auto p-5 m-5 border border-gray-200 rounded-lg bg-app-card" onContextMenu={(e) =>{handleRightClickMenu(e)}}>
+                           <Files onReady={()=> {setIsLoaded(true)}} />
+                            {
+                                rightClickMenu.visible && <RightClickMenu onRef={rightClickMenuRef} posX={rightClickMenu.x} posY={rightClickMenu.y}/>
+                            }
+                        </div>
                     </main>
 
             </div>

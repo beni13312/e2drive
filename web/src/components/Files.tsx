@@ -29,6 +29,49 @@ function Files({onReady}:props) {
             byteSize: "1024",
             modDate: "2026.06.01"
         },
+        {
+            id: 4,
+            type: "file",
+            name: "test",
+            byteSize: "1024",
+            modDate: "2026.06.01"
+        },
+        {
+            id: 5,
+            type: "file",
+            name: "test",
+            byteSize: "1024",
+            modDate: "2026.06.01"
+        },
+        {
+            id: 6,
+            type: "file",
+            name: "test",
+            byteSize: "1024",
+            modDate: "2026.06.01"
+        },
+        {
+            id: 7,
+            type: "file",
+            name: "test",
+            byteSize: "1024",
+            modDate: "2026.06.01"
+        },
+        {
+            id: 8,
+            type: "file",
+            name: "test",
+            byteSize: "1024",
+            modDate: "2026.06.01"
+        },
+        {
+            id: 9,
+            type: "file",
+            name: "test",
+            byteSize: "1024",
+            modDate: "2026.06.01"
+        },
+
     ];
 
     // simulate time delay
@@ -43,7 +86,7 @@ function Files({onReady}:props) {
 
     return (
         <>
-            <div className="storage-path-container flex w-full h-15">
+            <div className="storage-path-container flex w-full h-15 sticky top-0 bg-app-card">
                 <div className="storage-path flex ml-5 text-2xl text-gray-600 items-center">
                     {
                         examplePathResponse.segments.map((segment, index) => (
@@ -66,7 +109,7 @@ function Files({onReady}:props) {
                     <col className="w-auto"/>
                 </colgroup>
                 <thead>
-                <tr>
+                <tr className="sticky top-15 border-b bg-app-card" >
                     <th className="text-left border-b border-gray-400 py-4 px-8"></th>
                     <th className="text-left border-b hover:bg-gray-200 rounded-lg cursor-pointer border-gray-400 py-4 px-8">Name</th>
                     <th className="text-right border-b hover:bg-gray-200 rounded-lg cursor-pointer border-gray-400 py-4 px-8">Size</th>
