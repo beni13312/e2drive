@@ -1,11 +1,14 @@
-type props = {
+import React from "react";
+
+interface props {
+    onRef: React.RefObject<HTMLDivElement | null>,
     posX: number,
     posY: number
 }
 
-function RightClickMenu({posX, posY}:props){
+function RightClickMenu({onRef, posX, posY}:props){
     return (
-      <div className="right-click-menu rounded-lg absolute bg-app-card shadow-[4px_4px_8px_rgba(0,0,0,0.15)] w-50"
+      <div ref={onRef} className="right-click-menu rounded-lg absolute bg-app-card shadow-[4px_4px_8px_rgba(0,0,0,0.15)] w-50"
       style={
           {
               left: posX,

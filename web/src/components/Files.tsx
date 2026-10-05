@@ -109,11 +109,17 @@ function Files({onReady}:props) {
                     <col className="w-auto"/>
                 </colgroup>
                 <thead>
-                <tr className="sticky top-15 border-b bg-app-card" >
-                    <th className="text-left border-b border-gray-400 py-4 px-8"></th>
-                    <th className="text-left border-b hover:bg-gray-200 rounded-lg cursor-pointer border-gray-400 py-4 px-8">Name</th>
-                    <th className="text-right border-b hover:bg-gray-200 rounded-lg cursor-pointer border-gray-400 py-4 px-8">Size</th>
-                    <th className="text-right border-b hover:bg-gray-200 rounded-lg cursor-pointer border-gray-400 py-4 px-8">Date</th>
+                <tr>
+                    <th className="text-left sticky top-15 shadow-[inset_0_-1px_0_0_#9ca3af] bg-app-card py-4"></th>
+                    <th className="text-left sticky top-15 shadow-[inset_0_-1px_0_0_#9ca3af] bg-app-card py-4">
+                        <div className="hover:bg-gray-200 rounded-lg cursor-pointer py-2 px-8">Name</div>
+                    </th>
+                    <th className="text-right sticky top-15 shadow-[inset_0_-1px_0_0_#9ca3af] bg-app-card py-4">
+                        <div className="hover:bg-gray-200 rounded-lg cursor-pointer py-2 px-8">Size</div>
+                    </th>
+                    <th className="text-right sticky top-15 shadow-[inset_0_-1px_0_0_#9ca3af] bg-app-card py-4">
+                        <div className="hover:bg-gray-200 rounded-lg cursor-pointer py-2 px-8">Date</div>
+                    </th>
                 </tr>
                 </thead>
                 <tbody>

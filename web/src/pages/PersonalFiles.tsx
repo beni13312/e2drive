@@ -107,7 +107,7 @@ function PersonalFiles(){
                                 </div>
                                 {
                                     isProfileDropDown && (
-                                        <ul className="profile-drop-down w-60  rounded-lg top-20 right-0 absolute bg-app-card shadow-[4px_4px_8px_rgba(0,0,0,0.15)]">
+                                        <ul className="profile-drop-down w-60 z-1 rounded-lg top-20 right-0 absolute bg-app-card shadow-[4px_4px_8px_rgba(0,0,0,0.15)]">
                                             <li className="pl-5 p-2 hover:bg-gray-200 hover:rounded-lg cursor-pointer">Settings</li>
                                             <li className="pl-5 p-2 hover:bg-gray-200 hover:rounded-lg cursor-pointer">Information</li>
                                             <li onClick={handleLogOut} className="pl-5 p-2 hover:bg-gray-200 hover:rounded-lg cursor-pointer">Log out</li>
@@ -118,7 +118,7 @@ function PersonalFiles(){
                         </ul>
                     </header>
                     <main className="main w-full min-h-0 flex-1 mb-10">
-                        <div className="files-container h-full overflow-auto p-5 m-5 border border-gray-200 rounded-lg bg-app-card" onContextMenu={(e) =>{handleRightClickMenu(e)}}>
+                        <div className="files-container h-full overflow-auto pl-5 pb-5 pr-5 m-5 border border-gray-200 rounded-lg bg-app-card" onContextMenu={(e) =>{handleRightClickMenu(e)}}>
                            <Files onReady={()=> {setIsLoaded(true)}} />
                             {
                                 rightClickMenu.visible && <RightClickMenu onRef={rightClickMenuRef} posX={rightClickMenu.x} posY={rightClickMenu.y}/>
