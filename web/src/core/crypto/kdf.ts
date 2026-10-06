@@ -1,15 +1,14 @@
-import loadArgon2idWasm from "argon2id";
+import argon2 from "argon2-browser/dist/argon2-bundled.min.js"
 
 export async function generateKDF(inputPassword:string, inputSalt:Uint8Array): Promise<Uint8Array> {
-    const argon2id = await loadArgon2idWasm();
-    //const generatedSalt = crypto.getRandomValues(new Uint8Array(32));
-
-    return argon2id({
-        password: new TextEncoder().encode(inputPassword),
+    const result =  await argon2.hash({
+        type: argon2.ArgonType.Argon2id,
+        pass: inputPassword,
         salt: inputSalt,
         parallelism: 4,
-        passes: 2,
-        memorySize: 2 ** 16,
-        tagLength: 32
+        mem: 2 ** 16,
+        time: 3,
+        hashLen: 32
     });
+    return result.hash;
 }

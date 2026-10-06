@@ -16,12 +16,13 @@
     "react-router-dom": "^7.18.4",
     "tailwindcss": "^4.3.3",
     "axios": "1.20.0",
-    "argon2id": "^1.0.1"
+    "argon2-browser": "^1.18.0"
   },
   "devDependencies": {
     "@types/node": "^24.13.3",
     "@types/react": "^19.2.18",
     "@types/react-dom": "^19.2.7",
+    "@types/argon2-browser": "^1.18.4",
     "@vitejs/plugin-react": "^6.1.1",
     "oxlint": "^1.81.0",
     "typescript": "~6.0.2",

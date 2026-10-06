@@ -3,7 +3,6 @@ import {useNavigate} from "react-router-dom";
 import React, {useEffect, useState, useRef} from "react";
 import {logout, validateSession} from "../api/auth.ts";
 import Loading from "../components/Loading.tsx";
-import * as trace_events from "node:trace_events";
 import RightClickMenu from "../components/RightClickMenu.tsx";
 
 function PersonalFiles(){
@@ -34,7 +33,7 @@ function PersonalFiles(){
     });
 
     const profileDropDownRef = useRef<HTMLLIElement>(null);
-    const rightClickMenuRef = useRef<HTMLLIElement>(null);
+    const rightClickMenuRef = useRef<HTMLDivElement>(null);
 
     const handleProfileDropDown = (e:React.MouseEvent) => {
             e.stopPropagation();
@@ -107,11 +106,13 @@ function PersonalFiles(){
                                 </div>
                                 {
                                     isProfileDropDown && (
-                                        <ul className="profile-drop-down w-60 z-1 rounded-lg top-20 right-0 absolute bg-app-card shadow-[4px_4px_8px_rgba(0,0,0,0.15)]">
-                                            <li className="pl-5 p-2 hover:bg-gray-200 hover:rounded-lg cursor-pointer">Settings</li>
-                                            <li className="pl-5 p-2 hover:bg-gray-200 hover:rounded-lg cursor-pointer">Information</li>
-                                            <li onClick={handleLogOut} className="pl-5 p-2 hover:bg-gray-200 hover:rounded-lg cursor-pointer">Log out</li>
-                                        </ul>
+                                        <div className="profile-drop-down w-60 z-1 rounded-lg top-20 right-0 absolute bg-app-card shadow-[4px_4px_8px_rgba(0,0,0,0.15)]">
+                                            <ul>
+                                                <li className="pl-5 p-2 hover:bg-gray-200 hover:rounded-lg cursor-pointer">Settings</li>
+                                                <li className="pl-5 p-2 hover:bg-gray-200 hover:rounded-lg cursor-pointer">Information</li>
+                                                <li onClick={handleLogOut} className="pl-5 p-2 hover:bg-gray-200 hover:rounded-lg cursor-pointer">Log out</li>
+                                            </ul>
+                                        </div>
                                     )
                                 }
                             </li>

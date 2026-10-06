@@ -3,6 +3,7 @@ import db from "../database/connection.js"
 import * as argon2 from "argon2";
 import * as crypto from "node:crypto";
 import Config from "../config/config.js";
+import validateSession from "../middlewares/validateSession.js";
 
 const router = Router();
 
@@ -57,16 +58,16 @@ router.post("/login", async (req, res) => {
 
 router.get("/logout", async (req, res) => {
     try{
-        const cookie = req.headers.cookie || "";
-        if(cookie == ""){
+        const sessionCookie = req.cookies["session"] || "";
+        if(sessionCookie == ""){
             return res.status(401).json({error: "Not logged in"});
         }
 
-        const sessionToken = cookie.split('=')[1];
-        const sessionTokenHash = crypto.hash("sha256", sessionToken);
+        const sessionTokenHash = crypto.hash("sha256", sessionCookie);
 
         const result = await db()`DELETE FROM sessions WHERE token=${sessionTokenHash}`;
 
+        // remove session cookie from user's browser
         return res.status(200).cookie("session","",{
             httpOnly: true,
             secure: true,
@@ -80,27 +81,10 @@ router.get("/logout", async (req, res) => {
     }
 })
 
-router.get("/validate", async (req,res)=>{
+router.get("/validate", async (req,res, next)=>{
     try{
-        const cookie = req.headers.cookie || "";
-        if(cookie == ""){
-            return res.status(401).json({error: "Not logged in"});
-        }
-        const sessionToken = cookie.split('=')[1];
-        const sessionTokenHash = crypto.hash("sha256", sessionToken);
-        console.log("user-session-token-hash:" + sessionTokenHash);
-
-        const currentDate = new Date();
-        const result = await db()`select 1 from sessions where token=${sessionTokenHash} and expires_at > ${currentDate}::timestamptz`;
-
-        const isTokenValid = !!result[0];
-        console.log("is token valid:" + isTokenValid);
-
-        if(isTokenValid){
-            return res.status(200).json({validate: true});
-        }else{
-            return res.status(401).json({error: "Invalid Credentials: cookie"});
-        }
+        await validateSession(req,res,next);
+        return res.status(200).json({validate: true});
     }catch (error){
         return res.status(500).json({error: "Failed to validate session"});
     }

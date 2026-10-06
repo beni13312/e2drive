@@ -1,8 +1,13 @@
 import {login, validateSession} from "../api/auth.ts";
-import {type FormEvent, useState, useEffect} from "react";
+import {type FormEvent, useState, useEffect, type Dispatch, type SetStateAction} from "react";
 import {useNavigate} from "react-router-dom";
+import {generateKDF} from "../core/crypto/kdf.ts";
 
-function Login(){
+interface props{
+    setKey: Dispatch<SetStateAction<Uint8Array>>
+}
+
+function Login({setKey}:props){
     const navigate = useNavigate();
 
     // check session
@@ -27,6 +32,12 @@ function Login(){
 
     const handleSubmit = async (e: FormEvent) => {
         e.preventDefault();
+
+        const salt = Uint8Array.from(email);
+        
+        // set E2EE encryption key
+        setKey(await generateKDF(password, salt));
+
         const loginResponse = await login(email, password);
         if (loginResponse.login){
             navigate("/files");
@@ -45,7 +56,7 @@ function Login(){
                     <li>
                         <input className="login-email border-2 border-gray-300 px-4 focus:outline-none focus:border-gray-400 rounded-lg h-12 w-full"
                                value={email} onChange={(e)=>
-                        setEmail(e.target.value)} type="email" placeholder="E-mail"/>
+                        setEmail(e.target.value.toLowerCase())} type="email" placeholder="E-mail"/>
                     </li>
                     <li>
                         <input className="login-password border-2 border-gray-300 px-4 focus:outline-none focus:border-gray-400 rounded-lg h-12 w-full"

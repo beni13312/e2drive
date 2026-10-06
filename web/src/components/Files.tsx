@@ -1,4 +1,6 @@
 import {useEffect} from "react";
+import {listFiles} from "../api/files.ts";
+
 interface props {
     onReady: () => void;
 }
@@ -75,11 +77,17 @@ function Files({onReady}:props) {
     ];
 
     // simulate time delay
-    useEffect(() => {
+    useEffect(()  => {
         const testDelay = setTimeout(() => {
             onReady && onReady();
         }, 2000);
 
+        const getFilesList = async ()=>{
+            await listFiles();
+        }
+
+        getFilesList();
+        
         return () => clearTimeout(testDelay);
     }, [onReady]);
 
