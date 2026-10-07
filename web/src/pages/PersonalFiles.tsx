@@ -122,7 +122,7 @@ function PersonalFiles(){
                         <div className="files-container h-full overflow-auto pl-5 pb-5 pr-5 m-5 border border-gray-200 rounded-lg bg-app-card" onContextMenu={(e) =>{handleRightClickMenu(e)}}>
                            <Files onReady={()=> {setIsLoaded(true)}} />
                             {
-                                rightClickMenu.visible && <RightClickMenu onRef={rightClickMenuRef} posX={rightClickMenu.x} posY={rightClickMenu.y}/>
+                                rightClickMenu.visible && <RightClickMenu ref={rightClickMenuRef} posX={rightClickMenu.x} posY={rightClickMenu.y}/>
                             }
                         </div>
                     </main>

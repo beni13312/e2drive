@@ -91,7 +91,6 @@ function Files({onReady}:props) {
         return () => clearTimeout(testDelay);
     }, [onReady]);
 
-
     return (
         <>
             <div className="storage-path-container flex w-full h-15 sticky top-0 bg-app-card">
