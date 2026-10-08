@@ -31,6 +31,7 @@ function PersonalFiles(){
         x: 0,
         y: 0
     });
+    const [isRightClickEvent, setIsRightClickEvent] = useState(false);
 
     const profileDropDownRef = useRef<HTMLLIElement>(null);
     const rightClickMenuRef = useRef<HTMLDivElement>(null);
@@ -43,7 +44,7 @@ function PersonalFiles(){
     // make dropdown close when interaction happening outside
     useEffect(() => {
         const outOfProfileDropDown = (e:MouseEvent)=> {
-            if(profileDropDownRef.current && !profileDropDownRef.current.contains(e.target as Node)){
+            if((profileDropDownRef.current && !profileDropDownRef.current.contains(e.target as Node)) || isRightClickEvent){
                 setProfileDropDown(false);
             }
         }
@@ -122,7 +123,7 @@ function PersonalFiles(){
                         <div className="files-container h-full overflow-auto pl-5 pb-5 pr-5 m-5 border border-gray-200 rounded-lg bg-app-card" onContextMenu={(e) =>{handleRightClickMenu(e)}}>
                            <Files onReady={()=> {setIsLoaded(true)}} />
                             {
-                                rightClickMenu.visible && <RightClickMenu ref={rightClickMenuRef} posX={rightClickMenu.x} posY={rightClickMenu.y}/>
+                                rightClickMenu.visible && <RightClickMenu ref={rightClickMenuRef} eventBool={setIsRightClickEvent} posX={rightClickMenu.x} posY={rightClickMenu.y}/>
                             }
                         </div>
                     </main>
