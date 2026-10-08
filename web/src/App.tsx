@@ -14,7 +14,7 @@ function App() {
         <BrowserRouter>
             <Routes>
                 <Route path="/" element={<Login setKey={setE2EEKey}/>} />
-                <Route path="/files" element={<PersonalFiles />} />
+                <Route path="/files" element={<PersonalFiles encryptionKey={E2EEKey}/>} />
             </Routes>
         </BrowserRouter>
     </div>

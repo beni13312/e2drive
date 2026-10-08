@@ -1,12 +1,12 @@
-export default class E2EE{
+export default class E2ee {
     private key:Uint8Array;
 
-    constructor(inputKey:Uint8Array){
-        this.key = inputKey;
+    constructor(encryptionKey:Uint8Array){
+        this.key = encryptionKey;
     }
-    public static async new(inputKey:Uint8Array){
-        const hashedKey = await crypto.subtle.digest("sha-256", inputKey.buffer as ArrayBuffer);
-        return new E2EE(new Uint8Array(hashedKey));
+    public static async new(encryptionKey:Uint8Array){
+        const hashedKey = await crypto.subtle.digest("sha-256", encryptionKey.buffer as ArrayBuffer);
+        return new E2ee(new Uint8Array(hashedKey));
 
     }
 

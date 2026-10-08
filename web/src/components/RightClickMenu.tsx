@@ -1,16 +1,15 @@
 import React, {useRef} from "react";
-import {useState} from "react";
 import {UploadFile, UploadFolder} from "./Upload.tsx";
 
 interface props {
     ref: React.RefObject<HTMLDivElement | null>,
-    eventBool: (bool:boolean) => void
+    eventState: (bool:boolean) => void,
+    fileObject: (files:FileList | null) => void,
     posX: number,
     posY: number
 }
 
-function RightClickMenu({ref, eventBool, posX, posY}:props){
-    const [upload, setUpload] = useState<FileList | null>(null);
+function RightClickMenu({ref, eventState, fileObject, posX, posY}:props){
 
     const uploadFileRef = useRef<HTMLInputElement>(null);
     const uploadFolderRef = useRef<HTMLInputElement>(null);
@@ -30,8 +29,8 @@ function RightClickMenu({ref, eventBool, posX, posY}:props){
               top: posY,
           }
       }>
-          <UploadFile ref={uploadFileRef} eventBool={eventBool} fileObject={setUpload}/>
-          <UploadFolder ref={uploadFolderRef} eventBool={eventBool} fileObject={setUpload}/>
+          <UploadFile ref={uploadFileRef} eventState={eventState} fileObject={fileObject}/>
+          <UploadFolder ref={uploadFolderRef} eventState={eventState} fileObject={fileObject}/>
           <ul>
               <li className="pl-5 p-2 hover:bg-gray-200 hover:rounded-lg cursor-pointer">New folder</li>
               <li onClick={handleFileUpload} className="pl-5 p-2 hover:bg-gray-200 hover:rounded-lg cursor-pointer">File upload</li>

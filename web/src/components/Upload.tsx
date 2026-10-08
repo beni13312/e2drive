@@ -1,17 +1,17 @@
 import React from "react";
 interface props {
     ref: React.RefObject<HTMLInputElement | null>,
-    eventBool: (bool:boolean) => void,
-    fileObject: (files:FileList | null) => void
+    eventState: (event:boolean) => void,
+    fileObject: (files:FileList) => void
 }
 
-export function UploadFile({ref, eventBool, fileObject}:props){
+export function UploadFile({ref, eventState, fileObject}:props){
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>)=>{
         const file = e.target.files;
         console.log(file);
         if (!file) return;
         fileObject(file);
-        eventBool(true);
+        eventState(true);
     }
     return (
         <>
@@ -19,13 +19,13 @@ export function UploadFile({ref, eventBool, fileObject}:props){
         </>
     );
 }
-export function UploadFolder({ref, eventBool, fileObject}:props){
+export function UploadFolder({ref, eventState, fileObject}:props){
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>)=>{
         const folder = e.target.files;
         console.log(folder);
         if (!folder) return;
         fileObject(folder);
-        eventBool(true);
+        eventState(true);
     }
     return (
         <>

@@ -4,8 +4,12 @@ import db from "../database/connection.js";
 import {readdir} from "node:fs/promises";
 import Config from "../config/config.js";
 import path from "node:path";
+import multer from "multer"
 
 const router = Router();
+const multerInit = multer({
+    storage: multer.memoryStorage()
+});
 
 router.get("/list", async (req, res) => {
     try{
@@ -32,7 +36,23 @@ router.get("/list", async (req, res) => {
     }catch (error){
         return res.status(500).json({error: "Failed to get path"});
     }
-})
+});
+
+router.post("/upload", multerInit.single("data"), async (req, res) => {
+    try{
+        console.log(req.file);
+    }catch (error){
+        return res.status(500).json({error: "Failed to get path"});
+    }
+});
+
+router.get("/downlaod", async (req, res) => {
+    try{
+
+    }catch (error){
+        return res.status(500).json({error: "Failed to get path"});
+    }
+});
 
 
 export default router;
