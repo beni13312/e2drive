@@ -11,8 +11,11 @@ export async function listFiles(path:string = "/") {
     });
 }
 
-export async function uploadFiles(path:string, fileData:Blob) {
+export async function uploadFiles(path:string | null, filename:Blob, fileData:Blob) {
+    if(!path) path = "/";
+
     const formData = new FormData();
+    formData.append("filename", filename);
     formData.append("data", fileData);
 
     return await api.post(`/api/files/upload?path=${encodeURIComponent(path)}`,
@@ -25,7 +28,9 @@ export async function uploadFiles(path:string, fileData:Blob) {
     });
 }
 
-export async function donwloadFiles(path:string) {
+export async function donwloadFiles(path:string | null) {
+    if(!path) path = "/";
+
     return await api.get(`/api/files/download?path=${encodeURIComponent(path)}`
     ).then((res)=>{
         return res.data;

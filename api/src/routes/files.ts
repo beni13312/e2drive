@@ -7,6 +7,7 @@ import path from "node:path";
 import multer from "multer"
 
 const router = Router();
+// use multer for getting data from formData
 const multerInit = multer({
     storage: multer.memoryStorage()
 });
@@ -38,9 +39,15 @@ router.get("/list", async (req, res) => {
     }
 });
 
-router.post("/upload", multerInit.single("data"), async (req, res) => {
+router.post("/upload", multerInit.fields(
+    [
+        {name: "filename", maxCount: 1},
+        {name: "data", maxCount: 1},
+    ]
+), async (req, res) => {
     try{
-        console.log(req.file);
+        console.log("FilePath: " + req.query.path);
+        console.log(req.files);
     }catch (error){
         return res.status(500).json({error: "Failed to get path"});
     }

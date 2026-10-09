@@ -82,20 +82,21 @@ function PersonalFiles({encryptionKey}:props){
         for (const f of upload){
             console.log("Upload: " + f.name + "file size: " + Math.floor(f.size / 1024) + "KB");
 
+            const encryptedFileName = await e2ee.encrypt(Uint8Array.from(f.name));
+
             const bufferSize = 64 * 1024 // 64KB
             let size = f.size;
             let offset = 0;
             while (size > 0){
                 console.log("uploading");
-               const encryptedBuffer = await e2ee.encrypt((await f.bytes()).slice(offset, offset + bufferSize));
+                const encryptedBuffer = await e2ee.encrypt((await f.bytes()).slice(offset, offset + bufferSize));
 
-                await uploadFiles("/", new Blob([encryptedBuffer]));
+                await uploadFiles(null, new Blob([encryptedFileName]), new Blob([encryptedBuffer]));
                 offset += bufferSize;
                 size -= bufferSize;
             }
         }
 
-        //await uploadFiles("/",);
     }
 
     // make dropdown close when interaction happening outside
