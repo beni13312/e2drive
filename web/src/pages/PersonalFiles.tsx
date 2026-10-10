@@ -84,12 +84,15 @@ function PersonalFiles({encryptionKey}:props){
 
             const encryptedFileName = await e2ee.encrypt(Uint8Array.from(f.name));
 
-            const bufferSize = 64 * 1024 // 64KB
+            let bufferSize = 64 * 1024 // 64KB
             let size = f.size;
             let offset = 0;
+
+            const fileBytes = await f.bytes();
             while (size > 0){
+                bufferSize = Math.min(size, bufferSize);
                 console.log("uploading");
-                const encryptedBuffer = await e2ee.encrypt((await f.bytes()).slice(offset, offset + bufferSize));
+                const encryptedBuffer = await e2ee.encrypt(fileBytes.slice(offset, offset + bufferSize));
 
                 await uploadFiles(null, new Blob([encryptedFileName]), new Blob([encryptedBuffer]));
                 offset += bufferSize;

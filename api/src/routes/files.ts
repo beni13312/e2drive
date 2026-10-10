@@ -33,6 +33,7 @@ router.get("/list", async (req, res) => {
                 console.log("Directory: " + e.name);
             }
         }
+        return res.status(200).json({});
 
     }catch (error){
         return res.status(500).json({error: "Failed to get path"});
@@ -48,8 +49,10 @@ router.post("/upload", multerInit.fields(
     try{
         console.log("FilePath: " + req.query.path);
         console.log(req.files);
+
+        return res.status(200).json({});
     }catch (error){
-        return res.status(500).json({error: "Failed to get path"});
+        return res.status(500).json({error: "Failed to upload files"});
     }
 });
 
@@ -57,7 +60,7 @@ router.get("/downlaod", async (req, res) => {
     try{
 
     }catch (error){
-        return res.status(500).json({error: "Failed to get path"});
+        return res.status(500).json({error: "Failed to download files"});
     }
 });
 

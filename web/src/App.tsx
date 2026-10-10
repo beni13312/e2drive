@@ -3,18 +3,21 @@ import {BrowserRouter, Routes, Route} from "react-router-dom"
 import {useState} from "react";
 import Login from "./pages/Login.tsx";
 import PersonalFiles from "./pages/PersonalFiles.tsx";
+import AskEncryptionPassword from "./pages/AskEncryptionPassword.tsx";
 
 
 function App() {
-    const [E2EEKey, setE2EEKey] = useState<Uint8Array>(new Uint8Array());
-    console.log("E2EE encryption key set: " + (E2EEKey.length > 0))
+    const [encryptionKey, setEncryptionKey] = useState<Uint8Array>(new Uint8Array());
+    console.log("E2EE encryption key set: " + (encryptionKey.length > 0))
 
     return (
     <div className="app">
         <BrowserRouter>
             <Routes>
-                <Route path="/" element={<Login setKey={setE2EEKey}/>} />
-                <Route path="/files" element={<PersonalFiles encryptionKey={E2EEKey}/>} />
+                <Route path="/" element={<Login setKey={setEncryptionKey}/>} />
+                <Route path="/files" element={
+                    encryptionKey.length === 0 ? <AskEncryptionPassword/> :
+                    <PersonalFiles encryptionKey={encryptionKey}/>} />
             </Routes>
         </BrowserRouter>
     </div>
