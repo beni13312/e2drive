@@ -5,12 +5,51 @@ import {readdir} from "node:fs/promises";
 import Config from "../config/config.js";
 import path from "node:path";
 import multer from "multer"
+import * as argon2 from "argon2";
 
 const router = Router();
 // use multer for getting data from formData
 const multerInit = multer({
     storage: multer.memoryStorage()
 });
+
+
+// using a simpler check for now
+router.post("/checkEncryptionPassword", async (req, res) => {
+    try {
+        // check users credentials
+        const {password} = req.body || {};
+        const sessionCookie = req.cookies["session"];
+
+        if (!password || !sessionCookie){
+            return res.status(400).json({error: "Wrong password"});
+        }
+
+        const tokenHash = crypto.hash("sha256", sessionCookie);
+        const result =  await db()`SELECT users.password FROM users 
+                        JOIN sessions ON sessions.user_id = users.id WHERE sessions.token=${tokenHash}`;
+        const storedHash = result[0]?.password;
+
+        if(!storedHash){
+            return res.status(401).json({error: "Invalid Credentials: failed to retrieve data from database"});
+        }
+
+
+        const verifyHash = await argon2.verify(storedHash,password);
+        if (verifyHash){
+            const token = crypto.randomBytes(32).toString("hex");
+            const tokenHash = crypto.hash("sha256", token);
+
+            return res.status(200).json({encryptionPassword: true});
+
+        }else{
+            res.status(401).json({error: "Invalid Credentials: password is not matching"});
+        }
+    }catch (error){
+        console.log(error);
+        res.status(500).json({error: "Failed to retrieve data from database"});
+    }
+})
 
 router.get("/list", async (req, res) => {
     try{

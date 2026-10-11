@@ -1,5 +1,17 @@
 import {api} from "./api.ts";
 
+export async function checkEncryptionPassword(password: string) {
+    return await api.post("/api/files/checkEncryptionPassword", {
+        password: password,
+    }).then((res)=>{
+        return res.data;
+    }).catch((error) => {
+        console.log(error.response);
+        return error.response.data;
+    });
+}
+
+
 export async function listFiles(path:string = "/") {
     return await api.get(`/api/files/list?path=${encodeURIComponent(path)}`, {
 

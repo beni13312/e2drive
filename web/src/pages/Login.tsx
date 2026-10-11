@@ -1,45 +1,30 @@
-import {login, validateSession} from "../api/auth.ts";
-import {type FormEvent, useState, useEffect, type Dispatch, type SetStateAction} from "react";
+import {login} from "../api/auth.ts";
+import React, {useState, type Dispatch, type SetStateAction} from "react";
 import {useNavigate} from "react-router-dom";
 import {generateKDF} from "../core/crypto/kdf.ts";
 
 interface props{
-    setKey: Dispatch<SetStateAction<Uint8Array>>
+    onLogin: () => void,
+    setEncryptionPassword: Dispatch<SetStateAction<Uint8Array>>
 }
 
-function Login({setKey}:props){
+function Login({onLogin, setEncryptionPassword}:props){
     const navigate = useNavigate();
-
-    // check session
-    useEffect(()=>{
-        const effect = async ()=>{
-            const sessionCheck = await validateSession()
-            console.log("valid session: " + sessionCheck);
-            // if user authenticated already, navigate to files
-            if(sessionCheck){
-                navigate("/files");
-            }
-        };
-
-        effect();
-    }, [navigate]);
-
-
-
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [errorMsg, setErrorMsg] = useState("");
 
-    const handleSubmit = async (e: FormEvent) => {
+    const handleSubmit = async (e: React.SubmitEvent<HTMLFormElement>) => {
         e.preventDefault();
 
         const salt = Uint8Array.from(email);
         
         // set E2EE encryption key
-        setKey(await generateKDF(password, salt));
+        setEncryptionPassword(await generateKDF(password, salt));
 
         const loginResponse = await login(email, password);
         if (loginResponse.login){
+            onLogin();
             navigate("/files");
         }else{
             setErrorMsg(loginResponse.error);

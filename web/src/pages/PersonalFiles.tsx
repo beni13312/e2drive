@@ -1,34 +1,19 @@
 import Files from "../components/Files.tsx";
 import {useNavigate} from "react-router-dom";
 import React, {useEffect, useState, useRef} from "react";
-import {logout, validateSession} from "../api/auth.ts";
+import {logout} from "../api/auth.ts";
 import {uploadFiles} from "../api/files.ts";
 import Loading from "../components/Loading.tsx";
 import RightClickMenu from "../components/RightClickMenu.tsx";
 import E2ee from "../core/crypto/e2ee.ts";
 
 interface props{
+    onLogout: () => void,
     encryptionKey: Uint8Array
 }
 
-function PersonalFiles({encryptionKey}:props){
+function PersonalFiles({onLogout, encryptionKey}:props){
     const navigate = useNavigate();
-
-    // check session
-    useEffect(()=>{
-        const checkSession = async ()=>{
-            const sessionCheck = await validateSession();
-            console.log("valid session: " + sessionCheck);
-
-            // if user is not authenticated already, navigate to files
-            if(!sessionCheck){
-                navigate("/");
-            }
-        };
-
-
-        checkSession();
-    }, [navigate]);
 
     const [isLoaded, setIsLoaded] = useState(false);
     const [isProfileDropDown, setProfileDropDown] = useState(false);
@@ -50,7 +35,8 @@ function PersonalFiles({encryptionKey}:props){
 
     const handleLogOut = async ()=>{
         await logout();
-        window.location.reload();
+        onLogout();
+        navigate("/", {replace: true});
 
     };
 
