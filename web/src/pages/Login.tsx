@@ -34,9 +34,9 @@ function Login({onLogin, setEncryptionPassword}:props){
     return (
         <div className="login min-h-screen flex items-center justify-center">
 
-            <div className="container max-w-sm w-full">
+            <div className="login-container max-w-sm w-full">
                 <div className="logo flex  w-full p-10 top-1"><img src="../../src/assets/logo2.png" alt="logo"/></div>
-                <form onSubmit={(e)=>{handleSubmit(e)}}>
+                <form onSubmit={handleSubmit}>
                 <ul className="list-none space-y-2">
                     <li>
                         <input className="login-email border-2 border-gray-300 px-4 focus:outline-none focus:border-gray-400 rounded-lg h-12 w-full"
