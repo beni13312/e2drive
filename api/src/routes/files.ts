@@ -6,6 +6,7 @@ import Config from "../config/config.js";
 import path from "node:path";
 import multer from "multer"
 import * as argon2 from "argon2";
+import {isArray} from "node:util";
 
 const router = Router();
 // use multer for getting data from formData
@@ -21,7 +22,7 @@ router.post("/checkEncryptionPassword", async (req, res) => {
         const {password} = req.body || {};
         const sessionCookie = req.cookies["session"];
 
-        if (!password || !sessionCookie){
+        if (!password){
             return res.status(400).json({error: "Wrong password"});
         }
 
@@ -49,7 +50,29 @@ router.post("/checkEncryptionPassword", async (req, res) => {
         console.log(error);
         res.status(500).json({error: "Failed to retrieve data from database"});
     }
+});
+
+router.get("/getEmail", async (req, res) => {
+    try {
+        const sessionCookie = req.cookies["session"];
+
+        const tokenHash = crypto.hash("sha256", sessionCookie);
+        const result =  await db()`SELECT users.email FROM users 
+                        JOIN sessions ON sessions.user_id = users.id WHERE sessions.token=${tokenHash}`;
+        const storedEmail = result[0]?.email;
+
+        if(storedEmail){
+            return res.status(200).json({email: storedEmail});
+        }else{
+            res.status(401).json({error: "Invalid Credentials: password is not matching"});
+        }
+    }catch (error){
+        console.log(error);
+        res.status(500).json({error: "Failed to retrieve data from database"});
+    }
 })
+
+
 
 router.get("/list", async (req, res) => {
     try{
@@ -87,7 +110,23 @@ router.post("/upload", multerInit.fields(
 ), async (req, res) => {
     try{
         console.log("FilePath: " + req.query.path);
-        console.log(req.files);
+        const files = req.files;
+
+        if(!files || !files.data){
+            return res.status(400).json({error: "Failed to read request"});
+        }
+        console.log(files);
+
+        const sessionCookie = req.cookies["session"];
+
+        const tokenHash = crypto.hash("sha256", sessionCookie);
+       /* const result = db()`INSERT INTO files (owner_id, parent_id, encrypted_name, size, modified_at)
+                        VALUES (
+                        (SELECT users.id FROM users
+                        JOIN sessions ON sessions.user_id = users.id WHERE sessions.token=${tokenHash}),
+                                NULL,
+                                ${files.}
+                               )`; */
 
         return res.status(200).json({});
     }catch (error){

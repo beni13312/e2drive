@@ -4,7 +4,7 @@ import React, {useEffect, useState, useRef} from "react";
 import {logout} from "../api/auth.ts";
 import {uploadFiles} from "../api/files.ts";
 import Loading from "../components/Loading.tsx";
-import RightClickMenu from "../components/RightClickMenu.tsx";
+import {RightClickMenu} from "../components/RightClickMenu.tsx";
 import E2ee from "../core/crypto/e2ee.ts";
 
 interface props{
@@ -80,7 +80,7 @@ function PersonalFiles({onLogout, encryptionKey}:props){
                 console.log("uploading");
                 const encryptedBuffer = await e2ee.encrypt(fileBytes.slice(offset, offset + bufferSize));
 
-                await uploadFiles(null, new Blob([encryptedFileName]), new Blob([encryptedBuffer]));
+                await uploadFiles(null, new Blob([encryptedFileName]), String(new Date(f.lastModified)), String(f.size) ,new Blob([encryptedBuffer]));
                 offset += bufferSize;
                 size -= bufferSize;
             }

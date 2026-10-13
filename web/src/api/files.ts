@@ -11,6 +11,15 @@ export async function checkEncryptionPassword(password: string) {
     });
 }
 
+export async function getEmail(){
+    return await api.get("/api/files/getEmail", {
+    }).then((res)=>{
+        return res.data;
+    }).catch((error) => {
+        console.log(error.response);
+        return error.response.data;
+    });
+}
 
 export async function listFiles(path:string = "/") {
     return await api.get(`/api/files/list?path=${encodeURIComponent(path)}`, {
@@ -23,11 +32,20 @@ export async function listFiles(path:string = "/") {
     });
 }
 
-export async function uploadFiles(path:string | null, filename:Blob, fileData:Blob) {
+export async function uploadFiles(
+    path:string | null,
+    filename:Blob,
+    modDate:string,
+    size: string,
+    fileData:Blob
+)
+{
     if(!path) path = "/";
 
     const formData = new FormData();
     formData.append("filename", filename);
+    formData.append("modDate", modDate);
+    formData.append("size", size);
     formData.append("data", fileData);
 
     return await api.post(`/api/files/upload?path=${encodeURIComponent(path)}`,

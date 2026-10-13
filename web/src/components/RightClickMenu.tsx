@@ -9,7 +9,7 @@ interface props {
     posY: number
 }
 
-function RightClickMenu({ref, eventState, fileObject, posX, posY}:props){
+export function RightClickMenu({ref, eventState, fileObject, posX, posY}:props){
 
     const uploadFileRef = useRef<HTMLInputElement>(null);
     const uploadFolderRef = useRef<HTMLInputElement>(null);
@@ -39,4 +39,22 @@ function RightClickMenu({ref, eventState, fileObject, posX, posY}:props){
       </div>
     );
 }
-export default RightClickMenu;
+
+export function RightClickMenuOnEntry({ref, eventState, fileObject, posX, posY}:props){
+
+    return (
+        <div ref={ref} className="right-click-menu rounded-lg absolute bg-app-card shadow-[4px_4px_8px_rgba(0,0,0,0.15)] w-50"
+             style={
+                 {
+                     left: posX,
+                     top: posY,
+                 }
+             }>
+            <ul>
+                <li className="pl-5 p-2 hover:bg-gray-200 hover:rounded-lg cursor-pointer">View</li>
+                <li className="pl-5 p-2 hover:bg-gray-200 hover:rounded-lg cursor-pointer">Rename</li>
+                <li className="pl-5 p-2 hover:bg-gray-200 hover:rounded-lg cursor-pointer">Download</li>
+            </ul>
+        </div>
+    );
+}

@@ -37,7 +37,7 @@ function AppRoutes(){
             } />
             <Route path="/files" element={
                 (isSessionValid) ?
-                    (encryptionKey.length === 0 ? <AskEncryptionPassword setEncryptionPassword={setEncryptionKey}/> :
+                    (encryptionKey.length === 0 ? <AskEncryptionPassword setEncryptionKey={setEncryptionKey}/> :
                     <PersonalFiles onLogout={() => setIsSessionValid(false)} encryptionKey={encryptionKey}/>) : <Navigate to="/" />
             } />
         </Routes>
