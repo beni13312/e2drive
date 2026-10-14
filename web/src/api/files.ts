@@ -35,8 +35,8 @@ export async function listFiles(path:string = "/") {
 export async function uploadFiles(
     path:string | null,
     filename:Blob,
-    modDate:string,
     size: string,
+    modDate:string,
     fileData:Blob
 )
 {
@@ -44,8 +44,8 @@ export async function uploadFiles(
 
     const formData = new FormData();
     formData.append("filename", filename);
-    formData.append("modDate", modDate);
     formData.append("size", size);
+    formData.append("modDate", modDate);
     formData.append("data", fileData);
 
     return await api.post(`/api/files/upload?path=${encodeURIComponent(path)}`,

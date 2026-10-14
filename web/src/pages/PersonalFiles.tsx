@@ -80,7 +80,7 @@ function PersonalFiles({onLogout, encryptionKey}:props){
                 console.log("uploading");
                 const encryptedBuffer = await e2ee.encrypt(fileBytes.slice(offset, offset + bufferSize));
 
-                await uploadFiles(null, new Blob([encryptedFileName]), String(new Date(f.lastModified)), String(f.size) ,new Blob([encryptedBuffer]));
+                await uploadFiles(null, new Blob([encryptedFileName]), String(f.size), String(f.lastModified), new Blob([encryptedBuffer]));
                 offset += bufferSize;
                 size -= bufferSize;
             }

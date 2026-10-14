@@ -3,7 +3,7 @@ import {checkEncryptionPassword, getEmail} from "../api/files.ts";
 import {generateKDF} from "../core/crypto/kdf.ts";
 
 interface props {
-    setEncryptionKey: (encryptionKey:Uint8Array | null) => void
+    setEncryptionKey: (encryptionKey:Uint8Array) => void
 }
 
 function AskEncryptionPassword({setEncryptionKey}:props){

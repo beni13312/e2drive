@@ -6,7 +6,6 @@ import Config from "../config/config.js";
 import path from "node:path";
 import multer from "multer"
 import * as argon2 from "argon2";
-import {isArray} from "node:util";
 
 const router = Router();
 // use multer for getting data from formData
@@ -102,7 +101,13 @@ router.get("/list", async (req, res) => {
     }
 });
 
-router.post("/upload", multerInit.fields(
+// TODO: create another endpoint for writing file information into the database
+//  to avoid calling the database over and over
+
+router.post("uploadChunk"){
+    
+}
+router.post("/uploadInfo", multerInit.fields(
     [
         {name: "filename", maxCount: 1},
         {name: "data", maxCount: 1},
@@ -110,23 +115,34 @@ router.post("/upload", multerInit.fields(
 ), async (req, res) => {
     try{
         console.log("FilePath: " + req.query.path);
-        const files = req.files;
 
-        if(!files || !files.data){
+        if(!req.files || !req.body){
             return res.status(400).json({error: "Failed to read request"});
         }
-        console.log(files);
+
+        const files = req.files as {[filedname: string]: Express.Multer.File[]};
+        const body = req.body;
+
+        const filenameBytes = files.filename[0].buffer;
+        const size = body.size;
+        const modDate = new Date (Number(body.modDate));
+        const dataBytes = files.data[0].buffer;
+
+        console.log("File size: " + size);
+        console.log("File modDate: " + modDate);
 
         const sessionCookie = req.cookies["session"];
 
         const tokenHash = crypto.hash("sha256", sessionCookie);
-       /* const result = db()`INSERT INTO files (owner_id, parent_id, encrypted_name, size, modified_at)
+        const result = db()`INSERT INTO files (owner_id, parent_id, encrypted_name, size, modified_at)
                         VALUES (
                         (SELECT users.id FROM users
                         JOIN sessions ON sessions.user_id = users.id WHERE sessions.token=${tokenHash}),
                                 NULL,
-                                ${files.}
-                               )`; */
+                                ${filenameBytes},
+                                ${size},
+                                ${modDate}
+                               )`;
 
         return res.status(200).json({});
     }catch (error){

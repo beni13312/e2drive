@@ -18,7 +18,7 @@ function App() {
 }
 
 function AppRoutes(){
-    const [isSessionValid, setIsSessionValid] = useState<boolean | null>(false);
+    const [isSessionValid, setIsSessionValid] = useState<boolean>(false);
     const [encryptionKey, setEncryptionKey] = useState<Uint8Array>(new Uint8Array());
     console.log("E2EE encryption key set: " + (encryptionKey.length > 0))
 
