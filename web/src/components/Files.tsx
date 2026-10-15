@@ -1,4 +1,4 @@
-import {useEffect} from "react";
+import {useEffect, useState} from "react";
 import {listFiles} from "../api/files.ts";
 
 interface props {
@@ -9,86 +9,23 @@ function Files({onReady}:props) {
     const examplePathResponse = {
         segments: ["Storage", "testfolder1", "testfolder2"]
     };
-    const exampleResponse = [
-        {
-            id: 1,
-            type: "file",
-            name: "test",
-            byteSize: "1024",
-            modDate: "2026.06.01"
-        },
-        {
-            id: 2,
-            type: "file",
-            name: "test",
-            byteSize: "1024",
-            modDate: "2026.06.01"
-        },
-        {
-            id: 3,
-            type: "file",
-            name: "test",
-            byteSize: "1024",
-            modDate: "2026.06.01"
-        },
-        {
-            id: 4,
-            type: "file",
-            name: "test",
-            byteSize: "1024",
-            modDate: "2026.06.01"
-        },
-        {
-            id: 5,
-            type: "file",
-            name: "test",
-            byteSize: "1024",
-            modDate: "2026.06.01"
-        },
-        {
-            id: 6,
-            type: "file",
-            name: "test",
-            byteSize: "1024",
-            modDate: "2026.06.01"
-        },
-        {
-            id: 7,
-            type: "file",
-            name: "test",
-            byteSize: "1024",
-            modDate: "2026.06.01"
-        },
-        {
-            id: 8,
-            type: "file",
-            name: "test",
-            byteSize: "1024",
-            modDate: "2026.06.01"
-        },
-        {
-            id: 9,
-            type: "file",
-            name: "test",
-            byteSize: "1024",
-            modDate: "2026.06.01"
-        },
 
-    ];
+    const [response, setResponse] = useState<object[]>([]);
 
-    // simulate time delay
+    // get response
     useEffect(()  => {
-        const testDelay = setTimeout(() => {
-            onReady && onReady();
-        }, 2000);
 
         const getFilesList = async ()=>{
-            await listFiles();
+            const result = await listFiles();
+            if (!result.error){
+                setResponse(result);
+            }
+            console.log(response);
         }
 
         getFilesList();
         
-        return () => clearTimeout(testDelay);
+         if (onReady) onReady();
     }, [onReady]);
 
     return (
@@ -131,11 +68,16 @@ function Files({onReady}:props) {
                 </thead>
                 <tbody>
                 {
-                    exampleResponse.map((item) => (
+                    response.map((item) => (
                         <tr id={`${item.id}`} className="hover:bg-gray-200 cursor-pointer">
-                            <td className="py-4 border-b border-gray-400 pl-16">icon</td>
-                            <td className="py-4 border-b border-gray-400 px-8">{item.name}</td>
-                            <td className="py-4 border-b border-gray-400 px-8">{item.byteSize}</td>
+                            <td className="py-4 border-b border-gray-400 pl-16">
+                                {item.type == "file" ?
+                                    <img src="../assets/icons/draft_24dp_666666_FILL1_wght400_GRAD0_opsz24.svg" alt="file icon"/> :
+                                    <img src="../assets/icons/folder_24dp_ECB576_FILL1_wght400_GRAD0_opsz24.svg" alt="folder icon"/>
+                                }
+                            </td>
+                            <td className="py-4 border-b border-gray-400 px-8">{item.encryptedName}</td> {/* set encrypted name for testing */}
+                            <td className="py-4 border-b border-gray-400 px-8">{item.size}</td>
                             <td className="py-4 border-b border-gray-400 px-8">{item.modDate}</td>
                         </tr>
                     ))

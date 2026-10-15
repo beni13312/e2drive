@@ -1,8 +1,6 @@
 import {Router} from "express";
 import crypto from "node:crypto";
 import db from "../database/connection.js";
-import {readdir} from "node:fs/promises";
-import Config from "../config/config.js";
 import path from "node:path";
 import multer from "multer"
 import * as argon2 from "argon2";
@@ -75,44 +73,51 @@ router.get("/getEmail", async (req, res) => {
 
 router.get("/list", async (req, res) => {
     try{
+        const sessionCookie = req.cookies["session"];
+
+        const tokenHash = crypto.hash("sha256", sessionCookie);
+
         const requestedPath = path.resolve((req.query.path || "").toString());
         if(!requestedPath){
             return res.status(400).json({error: "Failed to get requested path"});
         }
-        const storagePath = path.resolve(Config.DATA_STORAGE);
-        const relativeSafePath = path.join(storagePath, requestedPath);
 
-        console.log("Relative safe path: " + relativeSafePath);
-        console.log("Storage path: " + path.resolve(Config.DATA_STORAGE));
+        const result = await db()`
+                            WITH "current_user" AS (
+                              SELECT users.id from users 
+                              JOIN sessions ON sessions.user_id = users.id WHERE sessions.token = ${tokenHash}
+                            )
+                            
+                            SELECT id, 'file' AS type, encrypted_name, size, modified_at FROM files WHERE parent_id IS NULL
+                            AND owner_id=(SELECT id FROM "current_user")
+                              UNION ALL
+                            SELECT id, 'folder' AS type,encrypted_name, size, modified_at FROM folders WHERE parent_id IS NULL
+                            AND owner_id=(SELECT id FROM "current_user");`;
 
-        const storage = await readdir(relativeSafePath, {withFileTypes: true});
+        let response:object[] = [];
 
-        for (const e of storage){
-            if (e.isFile()){
-                console.log("File: " + e.name);
-            }else if(e.isDirectory()){
-                console.log("Directory: " + e.name);
-            }
+        for (const row of result){
+            response.push({
+                id: row["id"],
+                type: row["type"],
+                encryptedName: (row["encrypted_name"] as Buffer).toString("base64"),
+                size: row["size"],
+                modDate: row["modified_at"]
+            });
         }
-        return res.status(200).json({});
+        if(response) {
+            return res.status(200).json(response);
+        }else {
+            return res.status(404).json({error: "Path not found"});
+        }
 
     }catch (error){
+        console.log(error);
         return res.status(500).json({error: "Failed to get path"});
     }
 });
 
-// TODO: create another endpoint for writing file information into the database
-//  to avoid calling the database over and over
-
-router.post("uploadChunk"){
-    
-}
-router.post("/uploadInfo", multerInit.fields(
-    [
-        {name: "filename", maxCount: 1},
-        {name: "data", maxCount: 1},
-    ]
-), async (req, res) => {
+router.post("/uploadMetadata", multerInit.single("filename"), async (req, res) => {
     try{
         console.log("FilePath: " + req.query.path);
 
@@ -126,7 +131,6 @@ router.post("/uploadInfo", multerInit.fields(
         const filenameBytes = files.filename[0].buffer;
         const size = body.size;
         const modDate = new Date (Number(body.modDate));
-        const dataBytes = files.data[0].buffer;
 
         console.log("File size: " + size);
         console.log("File modDate: " + modDate);
@@ -143,6 +147,25 @@ router.post("/uploadInfo", multerInit.fields(
                                 ${size},
                                 ${modDate}
                                )`;
+
+        return res.status(200).json({});
+    }catch (error){
+        return res.status(500).json({error: "Failed to upload files"});
+    }
+});
+
+router.post("/uploadChunk", multerInit.single("data"), async (req, res) => {
+    try{
+        if(!req.files || req.body){
+            return res.status(400).json({error: "Failed to read request"});
+        }
+
+        const files = req.files as {[filedname: string]: Express.Multer.File[]};
+        const body = req.body;
+
+        const writePath = body.path;
+        const dataBytes = files.data[0].buffer;
+
 
         return res.status(200).json({});
     }catch (error){
