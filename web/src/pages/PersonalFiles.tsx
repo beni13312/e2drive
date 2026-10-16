@@ -6,6 +6,7 @@ import {uploadFiles} from "../api/files.ts";
 import Loading from "../components/Loading.tsx";
 import {RightClickMenu} from "../components/RightClickMenu.tsx";
 import E2ee from "../core/crypto/e2ee.ts";
+import {getProfileName} from "../api/profile.ts";
 
 interface props{
     onLogout: () => void,
@@ -16,6 +17,7 @@ function PersonalFiles({onLogout, encryptionKey}:props){
     const navigate = useNavigate();
 
     const [isLoaded, setIsLoaded] = useState(false);
+    const [profileName, setProfileName] = useState("");
     const [isProfileDropDown, setProfileDropDown] = useState(false);
     const [rightClickMenu, setrightClickMenu] = useState({
         visible: false,
@@ -27,6 +29,13 @@ function PersonalFiles({onLogout, encryptionKey}:props){
 
     const profileDropDownRef = useRef<HTMLLIElement>(null);
     const rightClickMenuRef = useRef<HTMLDivElement>(null);
+
+    const handleProfileName = async ()=>{
+            const result = await getProfileName();
+            if (result.name){
+                setProfileName(result.name);
+            }
+    }
 
     const handleProfileDropDown = (e:React.MouseEvent) => {
             e.stopPropagation();
@@ -87,6 +96,13 @@ function PersonalFiles({onLogout, encryptionKey}:props){
         }
 
     }
+
+    useEffect(() => {
+        const profile = async ()=>{
+            handleProfileName();
+        }
+        profile();
+    }, [profileName]);
 
     // make dropdown close when interaction happening outside
     useEffect(() => {
@@ -152,12 +168,12 @@ function PersonalFiles({onLogout, encryptionKey}:props){
                                 <input className="border-2 border-gray-300 focus:outline-none px-4 rounded-lg h-10 w-100" placeholder="Search"/>
                             </li>
                             <li ref={profileDropDownRef} className="profile flex ml-auto items-center relative">
-                                <div onClick={(e)=>{handleProfileDropDown(e)}} className="profile-name hover:bg-gray-200 rounded-lg p-2 cursor-pointer">
-                                    Test Profile
+                                <div onClick={(e)=>handleProfileDropDown(e)} className="profile-name hover:bg-gray-200 rounded-lg p-2 cursor-pointer">
+                                    {profileName}
                                 </div>
                                 {
                                     isProfileDropDown && (
-                                        <div className="profile-drop-down w-60 z-1 rounded-lg top-20 right-0 absolute bg-app-card shadow-[4px_4px_8px_rgba(0,0,0,0.15)]">
+                                        <div className="profile-drop-down w-60 z-1 rounded-lg top-16 right-0 absolute bg-app-card shadow-[4px_4px_8px_rgba(0,0,0,0.15)]">
                                             <ul>
                                                 <li className="pl-5 p-2 hover:bg-gray-200 hover:rounded-lg cursor-pointer">Settings</li>
                                                 <li className="pl-5 p-2 hover:bg-gray-200 hover:rounded-lg cursor-pointer">Information</li>
@@ -171,7 +187,7 @@ function PersonalFiles({onLogout, encryptionKey}:props){
                     </header>
                     <main className="main w-full min-h-0 flex-1 mb-10">
                         <div className="files-container h-full overflow-auto pl-5 pb-5 pr-5 m-5 border border-gray-200 rounded-lg bg-app-card" onContextMenu={(e) =>{handleRightClickMenu(e)}}>
-                           <Files onReady={()=> {setIsLoaded(true)}} />
+                           <Files onReady={()=> setIsLoaded(true)} />
                             {
                                 rightClickMenu.visible && <RightClickMenu ref={rightClickMenuRef} eventState={setIsRightClickEvent} fileObject={setUpload} posX={rightClickMenu.x} posY={rightClickMenu.y}/>
                             }

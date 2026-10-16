@@ -1,6 +1,7 @@
 import express from 'express';
 import auth from './routes/auth.js';
 import files from './routes/files.js'
+import profile from './routes/profile.js';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import validateSession from "./middlewares/validateSession.js";
@@ -24,6 +25,7 @@ app.use("/api", validateSession);
 
 // authenticated endpoints
 app.use("/api/files", files);
+app.use("/api/profile", profile);
 
 app.listen(port, () => {
     console.log(`API server started on port ${port}`);

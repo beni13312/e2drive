@@ -61,7 +61,7 @@ router.get("/getEmail", async (req, res) => {
         if(storedEmail){
             return res.status(200).json({email: storedEmail});
         }else{
-            res.status(401).json({error: "Invalid Credentials: password is not matching"});
+            res.status(404).json({error: "Email not found"});
         }
     }catch (error){
         console.log(error);
@@ -94,10 +94,21 @@ router.get("/list", async (req, res) => {
                             SELECT id, 'folder' AS type,encrypted_name, size, modified_at FROM folders WHERE parent_id IS NULL
                             AND owner_id=(SELECT id FROM "current_user");`;
 
-        let response:object[] = [];
+
+        interface response{
+            path: object[],
+            items: object[]
+        }
+        let response:response = {
+                path:[],
+                items:[]
+
+        };
+
+        response.path.push(["Storage"]);
 
         for (const row of result){
-            response.push({
+            response.items.push({
                 id: row["id"],
                 type: row["type"],
                 encryptedName: (row["encrypted_name"] as Buffer).toString("base64"),
