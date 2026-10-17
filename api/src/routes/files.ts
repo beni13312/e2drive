@@ -82,13 +82,16 @@ router.get("/list", async (req, res) => {
             return res.status(400).json({error: "Failed to get requested path"});
         }
 
+        const parentId = Number(requestedPath.split('/').at(1)) || null;
+        console.log("parentId", parentId);
+
         const result = await db()`
                             WITH "current_user" AS (
                               SELECT users.id from users 
                               JOIN sessions ON sessions.user_id = users.id WHERE sessions.token = ${tokenHash}
                             )
                             
-                            SELECT id, 'file' AS type, encrypted_name, size, modified_at FROM files WHERE parent_id IS NULL
+                            SELECT id, 'file' AS type, encrypted_name, size, modified_at FROM files WHERE parent_id IS NULL 
                             AND owner_id=(SELECT id FROM "current_user")
                               UNION ALL
                             SELECT id, 'folder' AS type,encrypted_name, size, modified_at FROM folders WHERE parent_id IS NULL
