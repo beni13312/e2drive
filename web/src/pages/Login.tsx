@@ -1,6 +1,7 @@
 import {login} from "../api/auth.ts";
 import React, {useState, type Dispatch, type SetStateAction} from "react";
 import {useNavigate} from "react-router-dom";
+import Logo from "../assets/logo/logo.svg?react";
 import {generateKDF} from "../core/crypto/kdf.ts";
 
 interface props{
@@ -34,7 +35,12 @@ function Login({onLogin, setEncryptionPassword}:props){
     return (
         <div className="login min-h-screen flex items-center justify-center">
             <div className="login-container max-w-sm w-full">
-                <div className="logo flex  w-full p-10 top-1"><img src="../../src/assets/logo2.png" alt="logo"/></div>
+                <div className="logo flex flex-col w-full pb-10 top-1">
+                    <Logo className="flex translate-y-42"/>
+                    <div className="flex justify-center text-8xl text-[#183454]"><strong>E2</strong>Drive</div>
+                    <div className="flex justify-center text-2xl text-[#183454]"><strong>END-TO-END-ENCRYPTED</strong></div>
+
+                </div>
                 <form onSubmit={handleSubmit}>
                     <div className="space-y-2">
                             <input className="login-email border-2 border-gray-300 px-4 focus:outline-none focus:border-gray-400 rounded-lg h-12 w-full"

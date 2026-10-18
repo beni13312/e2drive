@@ -7,6 +7,7 @@ import Loading from "../components/Loading.tsx";
 import {RightClickMenu} from "../components/RightClickMenu.tsx";
 import E2ee from "../core/crypto/e2ee.ts";
 import {getProfileName} from "../api/profile.ts";
+import Logo from "../assets/logo/logo.svg?react";
 
 interface props{
     onLogout: () => void,
@@ -162,7 +163,7 @@ function PersonalFiles({onLogout, encryptionKey}:props){
                     <header className="header shrink-0 shadow-[0_4px_8px_rgba(0,0,0,0.15)]" >
                         <ul className="list-none ml-5 mr-5 flex">
                             <li className="logo flex w-15">
-                                <img src="../../src/assets/logo.png" alt="logo"/>
+                                <Logo className="size-15 scale-180 translate-y-4"/>
                             </li>
                             <li className="searchbar flex ml-auto items-center">
                                 <input className="border-2 border-gray-300 focus:outline-none px-4 rounded-lg h-10 w-100" placeholder="Search"/>
