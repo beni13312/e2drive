@@ -4,7 +4,7 @@ import {useEffect, useState} from "react";
 import Login from "./pages/Login.tsx";
 import PersonalFiles from "./pages/PersonalFiles.tsx";
 import AskEncryptionPassword from "./pages/AskEncryptionPassword.tsx";
-import {validateSession} from "./api/auth.ts";
+import {validateSession} from "./api/validate.ts";
 
 
 function App() {

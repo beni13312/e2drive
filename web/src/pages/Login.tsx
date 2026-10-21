@@ -33,12 +33,12 @@ function Login({onLogin, setEncryptionPassword}:props){
     }
 
     return (
-        <div className="login min-h-screen flex items-center justify-center">
+        <div className="login min-h-screen flex justify-center">
             <div className="login-container max-w-sm w-full">
                 <div className="logo flex flex-col w-full pb-10 top-1">
-                    <Logo className="flex translate-y-42"/>
+                    <Logo className="flex ml-auto mr-auto size-60 translate-y-8"/>
                     <div className="flex justify-center text-8xl text-[#183454]"><strong>E2</strong>Drive</div>
-                    <div className="flex justify-center text-2xl text-[#183454]"><strong>END-TO-END-ENCRYPTED</strong></div>
+                    <div className="flex justify-center text-[27.5px] text-[#183454]"><strong>END-TO-END-ENCRYPTED</strong></div>
 
                 </div>
                 <form onSubmit={handleSubmit}>

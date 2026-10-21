@@ -22,14 +22,3 @@ export async function logout() {
         return error.response.data;
     });
 }
-
-export async function validateSession() {
-    return await api.get("/api/auth/validate", {
-    }).then((res)=>{
-        return !!res.data?.validate;
-
-    }).catch((error) => {
-        console.log(error.response);
-        return false;
-    });
-}

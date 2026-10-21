@@ -81,13 +81,4 @@ router.get("/logout", async (req, res) => {
     }
 })
 
-router.get("/validate", async (req,res, next)=>{
-    try{
-        await validateSession(req,res,next);
-        return res.status(200).json({validate: true});
-    }catch (error){
-        return res.status(500).json({error: "Failed to validate session"});
-    }
-});
-
-export default router
+export default router;

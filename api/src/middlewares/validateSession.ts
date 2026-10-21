@@ -22,7 +22,7 @@ async function validateSession(req:Request, res:Response, next:NextFunction){
             return res.status(401).json({error: "Invalid Credentials: cookie"});
         }
 
-        next();
+        return next();
     }catch (error){
         return res.status(500).json({error: "Failed to validate session"});
     }

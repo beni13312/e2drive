@@ -1,7 +1,7 @@
 import React from "react";
 interface props {
     ref: React.RefObject<HTMLInputElement | null>,
-    eventState: (event:boolean) => void,
+    eventState: () => void,
     fileObject: (files:FileList) => void
 }
 
@@ -11,7 +11,7 @@ export function UploadFile({ref, eventState, fileObject}:props){
         console.log(file);
         if (!file) return;
         fileObject(file);
-        eventState(true);
+        eventState();
     }
     return (
         <>
@@ -25,7 +25,7 @@ export function UploadFolder({ref, eventState, fileObject}:props){
         console.log(folder);
         if (!folder) return;
         fileObject(folder);
-        eventState(true);
+        eventState();
     }
     return (
         <>

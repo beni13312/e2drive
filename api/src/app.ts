@@ -5,6 +5,7 @@ import profile from './routes/profile.js';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import validateSession from "./middlewares/validateSession.js";
+import validate from "./routes/validate.js";
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -24,6 +25,7 @@ app.use("/api/auth", auth);
 app.use("/api", validateSession);
 
 // authenticated endpoints
+app.use("/api/validate", validate);
 app.use("/api/files", files);
 app.use("/api/profile", profile);
 

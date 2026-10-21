@@ -3,7 +3,7 @@ import {UploadFile, UploadFolder} from "./Upload.tsx";
 
 interface props {
     ref: React.RefObject<HTMLDivElement | null>,
-    eventState: (bool:boolean) => void,
+    eventState: () => void,
     fileObject: (files:FileList | null) => void,
     posX: number,
     posY: number
@@ -29,8 +29,8 @@ export function RightClickMenu({ref, eventState, fileObject, posX, posY}:props){
               top: posY,
           }
       }>
-          <UploadFile ref={uploadFileRef} eventState={eventState} fileObject={fileObject}/>
-          <UploadFolder ref={uploadFolderRef} eventState={eventState} fileObject={fileObject}/>
+          <UploadFile ref={uploadFileRef} eventState={()=> eventState()} fileObject={fileObject}/>
+          <UploadFolder ref={uploadFolderRef} eventState={()=> eventState()} fileObject={fileObject}/>
           <ul>
               <li className="pl-5 p-2 hover:bg-gray-200 hover:rounded-lg cursor-pointer">New folder</li>
               <li onClick={handleFileUpload} className="pl-5 p-2 hover:bg-gray-200 hover:rounded-lg cursor-pointer">File upload</li>

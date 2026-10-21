@@ -20,7 +20,7 @@ function PersonalFiles({onLogout, encryptionKey}:props){
     const [isLoaded, setIsLoaded] = useState(false);
     const [profileName, setProfileName] = useState("");
     const [isProfileDropDown, setProfileDropDown] = useState(false);
-    const [rightClickMenu, setrightClickMenu] = useState({
+    const [rightClickMenu, setRightClickMenu] = useState({
         visible: false,
         x: 0,
         y: 0
@@ -53,7 +53,7 @@ function PersonalFiles({onLogout, encryptionKey}:props){
     const handleRightClickMenu = (e:React.MouseEvent)=>{
         e.preventDefault();
 
-        setrightClickMenu({
+        setRightClickMenu({
             visible: true,
             x: e.clientX,
             y: e.clientY
@@ -61,7 +61,7 @@ function PersonalFiles({onLogout, encryptionKey}:props){
     };
 
     const handleRightClickMenuClose = () =>{
-        setrightClickMenu({
+        setRightClickMenu({
             visible: false,
             x: 0,
             y: 0
@@ -100,10 +100,10 @@ function PersonalFiles({onLogout, encryptionKey}:props){
 
     useEffect(() => {
         const profile = async ()=>{
-            handleProfileName();
+            await handleProfileName();
         }
         profile();
-    }, [profileName]);
+    }, []);
 
     // make dropdown close when interaction happening outside
     useEffect(() => {
@@ -163,13 +163,13 @@ function PersonalFiles({onLogout, encryptionKey}:props){
                     <header className="header shrink-0 shadow-[0_4px_8px_rgba(0,0,0,0.15)]" >
                         <ul className="list-none ml-5 mr-5 flex">
                             <li className="logo flex w-15">
-                                <Logo className="size-15 scale-180 translate-y-4"/>
+                                <Logo className="size-15"/>
                             </li>
                             <li className="searchbar flex ml-auto items-center">
                                 <input className="border-2 border-gray-300 focus:outline-none px-4 rounded-lg h-10 w-100" placeholder="Search"/>
                             </li>
                             <li ref={profileDropDownRef} className="profile flex ml-auto items-center relative">
-                                <div onClick={(e)=>handleProfileDropDown(e)} className="profile-name hover:bg-gray-200 rounded-lg p-2 cursor-pointer">
+                                <div onClick={(e)=> handleProfileDropDown(e)} className="profile-name hover:bg-gray-200 rounded-lg p-2 cursor-pointer">
                                     {profileName}
                                 </div>
                                 {
@@ -190,7 +190,7 @@ function PersonalFiles({onLogout, encryptionKey}:props){
                         <div className="files-container h-full overflow-auto pl-5 pb-5 pr-5 m-5 border border-gray-200 rounded-lg bg-app-card" onContextMenu={(e) =>{handleRightClickMenu(e)}}>
                            <Files onReady={()=> setIsLoaded(true)} />
                             {
-                                rightClickMenu.visible && <RightClickMenu ref={rightClickMenuRef} eventState={setIsRightClickEvent} fileObject={setUpload} posX={rightClickMenu.x} posY={rightClickMenu.y}/>
+                                rightClickMenu.visible && <RightClickMenu ref={rightClickMenuRef} eventState={()=> setIsRightClickEvent(true)} fileObject={setUpload} posX={rightClickMenu.x} posY={rightClickMenu.y}/>
                             }
                         </div>
                     </main>
