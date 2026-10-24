@@ -168,17 +168,15 @@ router.post("/uploadMetadata", multerInit.single("filename"), async (req, res) =
     }
 });
 
-router.post("/uploadChunk", multerInit.single("data"), async (req, res) => {
+router.post("/uploadChunk", async (req, res) => {
     try{
-        if(!req.files || req.body){
-            return res.status(400).json({error: "Failed to read request"});
-        }
+        req.on('data', (chunk: Buffer) => {
+            console.log(`Chunk size: ${chunk.length} Byte`);
+        });
 
-        const files = req.files as {[filedname: string]: Express.Multer.File[]};
         const body = req.body;
-
-        const writePath = body.path;
-        const dataBytes = files.data[0].buffer;
+        const writePath = req.headers.path;
+        const dataBytes = req.headers.dataSize;
 
 
         return res.status(200).json({});

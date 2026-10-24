@@ -32,23 +32,21 @@ export async function listFiles(path:string = "/") {
     });
 }
 
-export async function uploadFiles(
+export async function uploadMetaData(
     path:string | null,
     filename:Blob,
     size: string,
-    modDate:string,
-    fileData:Blob
+    modDate:string
 )
 {
     if(!path) path = "/";
 
     const formData = new FormData();
     formData.append("filename", filename);
-    formData.append("size", size);
+    formData.append("DataSize", size);
     formData.append("modDate", modDate);
-    formData.append("data", fileData);
 
-    return await api.post(`/api/files/upload?path=${encodeURIComponent(path)}`,
+    return await api.post(`/api/files/uploadMetaData?path=${encodeURIComponent(path)}`,
         formData
     ).then((res)=>{
         return res.data;
@@ -58,7 +56,28 @@ export async function uploadFiles(
     });
 }
 
-export async function donwloadFiles(path:string | null) {
+export async function uploadChunk(
+    fileStream:ReadableStream
+)
+{
+    return await fetch("http://localhost:3000/api/files/uploadChunk", {
+        method: "POST",
+        credentials: "include",
+        headers: {
+            "Content-Type": "application/octet-stream",
+        },
+        body:fileStream,
+        // @ts-ignore
+        duplex: "half"
+    }).then(async (res)=>{
+        return res.status;
+    }).catch((error) => {
+        console.log(error.messsage);
+        return error.message;
+    });
+}
+
+export async function downloadFiles(path:string | null) {
     if(!path) path = "/";
 
     return await api.get(`/api/files/download?path=${encodeURIComponent(path)}`

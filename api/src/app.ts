@@ -29,6 +29,11 @@ app.use("/api/validate", validate);
 app.use("/api/files", files);
 app.use("/api/profile", profile);
 
+// catch all invalid paths
+app.use((req, res) => {
+    return res.status(404).json({error: "Not Found"});
+});
+
 app.listen(port, () => {
     console.log(`API server started on port ${port}`);
 })

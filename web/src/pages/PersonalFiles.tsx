@@ -2,7 +2,7 @@ import Files from "../components/Files.tsx";
 import {useNavigate} from "react-router-dom";
 import React, {useEffect, useState, useRef} from "react";
 import {logout} from "../api/auth.ts";
-import {uploadFiles} from "../api/files.ts";
+import {uploadMetaData, uploadChunk} from "../api/files.ts";
 import Loading from "../components/Loading.tsx";
 import {RightClickMenu} from "../components/RightClickMenu.tsx";
 import E2ee from "../core/crypto/e2ee.ts";
@@ -78,23 +78,41 @@ function PersonalFiles({onLogout, encryptionKey}:props){
 
             const encryptedFileName = await e2ee.encrypt(Uint8Array.from(f.name));
 
+            const uploadFileInfo = await uploadMetaData(null, new Blob([encryptedFileName]), String(f.size), String(f.lastModified));
+            if (uploadFileInfo.id){
+                // get ids from response to be able to upload the data
+            }
+
             let bufferSize = 64 * 1024 // 64KB
             let size = f.size;
             let offset = 0;
 
-            const fileBytes = await f.bytes();
-            while (size > 0){
-                bufferSize = Math.min(size, bufferSize);
-                console.log("uploading");
-                const encryptedBuffer = await e2ee.encrypt(fileBytes.slice(offset, offset + bufferSize));
+            // making stream from chunks
+            const dataStream = new ReadableStream({
+                async start(controller){
+                    try{
+                        while (size > 0){
+                            bufferSize = Math.min(size, bufferSize);
+                            console.log("uploading");
+                            const encryptedBuffer = await e2ee.encrypt(new Uint8Array(await f.slice(offset, offset + bufferSize).arrayBuffer()));
 
-                await uploadFiles(null, new Blob([encryptedFileName]), String(f.size), String(f.lastModified), new Blob([encryptedBuffer]));
-                offset += bufferSize;
-                size -= bufferSize;
-            }
+                            controller.enqueue(encryptedBuffer);
+
+                            offset += bufferSize;
+                            size -= bufferSize;
+                        }
+                        controller.close();
+                    }catch (error){
+                        controller.error(error);
+                    }
+                }
+
+            });
+
+            const result = await uploadChunk(dataStream);
         }
 
-    }
+    };
 
     useEffect(() => {
         const profile = async ()=>{
