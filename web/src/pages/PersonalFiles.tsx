@@ -25,8 +25,6 @@ function PersonalFiles({onLogout, encryptionKey}:props){
         x: 0,
         y: 0
     });
-    const [isRightClickEvent, setIsRightClickEvent] = useState(false);
-    const [upload, setUpload] = useState<FileList | null>(null);
 
     const profileDropDownRef = useRef<HTMLLIElement>(null);
     const rightClickMenuRef = useRef<HTMLDivElement>(null);
@@ -68,7 +66,7 @@ function PersonalFiles({onLogout, encryptionKey}:props){
         });
     }
 
-    const handleUpload = async ()=>{
+    const handleUpload = async (upload: FileList | null)=>{
         if (!upload) return;
 
         const e2ee = await E2ee.new(encryptionKey);
@@ -131,28 +129,6 @@ function PersonalFiles({onLogout, encryptionKey}:props){
         }
     }, []);
 
-    // close right click menu after interaction
-    useEffect(() => {
-        const onEventRightClickMenu = ()=>{
-            if (isRightClickEvent) {
-                setIsRightClickEvent(false);
-                handleRightClickMenuClose();
-            }
-        }
-        onEventRightClickMenu();
-    }, [isRightClickEvent]);
-
-    useEffect(() => {
-        const uploadOnSet = async ()=>{
-            if (upload){
-                await handleUpload()
-            }
-        };
-        uploadOnSet();
-
-    }, [upload]);
-
-
 
     return (
         <>
@@ -190,7 +166,7 @@ function PersonalFiles({onLogout, encryptionKey}:props){
                         <div className="files-container h-full overflow-auto pl-5 pb-5 pr-5 m-5 border border-gray-200 rounded-lg bg-app-card" onContextMenu={(e) =>{handleRightClickMenu(e)}}>
                            <Files onReady={()=> setIsLoaded(true)} />
                             {
-                                rightClickMenu.visible && <RightClickMenu ref={rightClickMenuRef} eventState={()=> setIsRightClickEvent(true)} fileObject={setUpload} posX={rightClickMenu.x} posY={rightClickMenu.y}/>
+                                rightClickMenu.visible && <RightClickMenu ref={rightClickMenuRef} eventState={()=> handleRightClickMenuClose()} fileObject={handleUpload} posX={rightClickMenu.x} posY={rightClickMenu.y}/>
                             }
                         </div>
                     </main>

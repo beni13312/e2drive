@@ -45,9 +45,9 @@ function Files({onReady}:props) {
         getFilesList();
         
          if (onReady) onReady();
-    }, [onReady]);
+    }, []);
 
-    const handleItemClick = (e:MouseEvent<HTMLTableRowElement>, id:string, type:string)=> {
+    const handleItemClick = (e:MouseEvent, id:string, type:string)=> {
       console.log("clicked: " + id + ' ' + type);
 
       if (type === "folder"){
