@@ -88,25 +88,24 @@ function PersonalFiles({onLogout, encryptionKey}:props){
             let offset = 0;
 
             // making stream from chunks
-            const dataStream = new ReadableStream({
-                async start(controller){
-                    try{
-                        while (size > 0){
-                            bufferSize = Math.min(size, bufferSize);
-                            console.log("uploading");
-                            const encryptedBuffer = await e2ee.encrypt(new Uint8Array(await f.slice(offset, offset + bufferSize).arrayBuffer()));
+            const dataStream = new ReadableStream<Uint8Array>({
+                 async start(controller){
+                       try{
+                            while (size > 0){
+                                bufferSize = Math.min(size, bufferSize);
+                                console.log("uploading");
+                                const encryptedBuffer = await e2ee.encrypt(new Uint8Array(await f.slice(offset, offset + bufferSize).arrayBuffer()));
 
-                            controller.enqueue(encryptedBuffer);
+                                controller.enqueue(encryptedBuffer);
 
-                            offset += bufferSize;
-                            size -= bufferSize;
+                                offset += bufferSize;
+                                size -= bufferSize;
+                            }
+                            controller.close();
+                        }catch (error){
+                            controller.error(error);
                         }
-                        controller.close();
-                    }catch (error){
-                        controller.error(error);
                     }
-                }
-
             });
 
             const result = await uploadChunk(dataStream);

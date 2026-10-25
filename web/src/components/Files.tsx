@@ -17,6 +17,18 @@ interface response{
     modDate: string
 }
 
+function parseUrl (path:Array<string>): String{
+    let strUrl = "";
+    path.forEach((segment, index)=>{
+        strUrl += segment;
+        if(index < path.length - 1){
+            strUrl += '/';
+        }
+    });
+    return strUrl;
+}
+
+
 function Files({onReady}:props) {
     const location = useLocation();
     const navigate = useNavigate();
@@ -32,13 +44,18 @@ function Files({onReady}:props) {
             if (!result.error && result.items && result.path){
                 setResponse(result.items);
 
+                const urlPath = parseUrl(result.path);
+
+                console.log("URL path: " + urlPath);
+                console.log("Response path:" + result.path);
+
                 // navigate only if the pathname does not include the path already
-                if (!location.pathname.includes(result.path)){
-                    navigate(result.path);
+                if (location.pathname != urlPath){
+                    navigate(urlPath);
                 }
                 setPath(result.path);
+
             }
-            console.log(result.path);
             console.log(response);
         }
 
@@ -52,14 +69,17 @@ function Files({onReady}:props) {
 
       if (type === "folder"){
           const handleOpenFolder = async () => {
-              const UrlPath = path + '/' + id;
+              const urlPath = parseUrl(path);
+              const UrlPath = urlPath + '/' + id;
               const result = await listFiles(UrlPath);
+              setResponse(result.items);
 
               // navigate only if the pathname does not include the path already
               if (!location.pathname.includes(id)){
                   navigate(id);
               }
               setPath(result.path);
+              console.log(result);
           }
           handleOpenFolder();
       }

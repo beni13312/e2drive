@@ -1,5 +1,5 @@
 import './App.css'
-import {BrowserRouter, Routes, Route, Navigate} from "react-router-dom"
+import {BrowserRouter, Routes, Route, Navigate, useLocation} from "react-router-dom"
 import {useEffect, useState} from "react";
 import Login from "./pages/Login.tsx";
 import PersonalFiles from "./pages/PersonalFiles.tsx";
@@ -18,6 +18,8 @@ function App() {
 }
 
 function AppRoutes(){
+    const location = useLocation();
+
     const [isSessionValid, setIsSessionValid] = useState<boolean>(false);
     const [encryptionKey, setEncryptionKey] = useState<Uint8Array>(new Uint8Array());
     console.log("E2EE encryption key set: " + (encryptionKey.length > 0))
@@ -33,7 +35,7 @@ function AppRoutes(){
     return (
         <Routes>
             <Route path="/" element={
-                (isSessionValid) ? <Navigate to="/files" /> : <Login onLogin={() => setIsSessionValid(true)} setEncryptionPassword={setEncryptionKey} />
+                (isSessionValid) ? <Navigate to="/files" replace /> : <Login onLogin={() => setIsSessionValid(true)} setEncryptionPassword={setEncryptionKey} />
             } />
             <Route path="/files/*" element={
                 (isSessionValid) ?
