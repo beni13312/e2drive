@@ -17,7 +17,7 @@ interface response{
     modDate: string
 }
 
-function parseUrl (path:Array<string>): String{
+function parseUrl (path:Array<string>): string{
     let strUrl = "";
     path.forEach((segment, index)=>{
         strUrl += segment;
@@ -64,7 +64,7 @@ function Files({onReady}:props) {
          if (onReady) onReady();
     }, []);
 
-    const handleItemClick = (e:MouseEvent, id:string, type:string)=> {
+    const handleItemClick = (e:MouseEvent, id:string, type:string, name:string)=> {
       console.log("clicked: " + id + ' ' + type);
 
       if (type === "folder"){
@@ -78,7 +78,8 @@ function Files({onReady}:props) {
               if (!location.pathname.includes(id)){
                   navigate(id);
               }
-              setPath(result.path);
+              setPath(prev => [...prev, name]);
+              console.log("Path: " + path);
               console.log(result);
           }
           handleOpenFolder();
@@ -129,7 +130,7 @@ function Files({onReady}:props) {
                 <tbody>
                 {
                     response.map((item) => (
-                        <tr onClick={(e) => handleItemClick(e, item.id, item.type)} id={item.id} className="hover:bg-gray-200 cursor-pointer">
+                        <tr onClick={(e) => handleItemClick(e, item.id, item.type, item.encryptedName)} id={item.id} className="hover:bg-gray-200 cursor-pointer">
                             <td className="py-4 border-b border-gray-400 pl-4">
                                 {
                                     item.type === "file" ? <FileIcon className="w-7 h-7"/> : <FolderIcon className="w-7 h-7"/>

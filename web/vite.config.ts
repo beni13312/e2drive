@@ -10,4 +10,7 @@ export default defineConfig({
       tailwindcss(),
       svgr()
   ],
+    server: {
+      allowedHosts: ["e2drive.local"]
+    }
 })

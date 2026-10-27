@@ -1,4 +1,4 @@
-import {api} from "./api.ts";
+import {baseURL, api} from "./api.ts";
 
 export async function checkEncryptionPassword(password: string) {
     return await api.post("/api/files/checkEncryptionPassword", {
@@ -60,7 +60,7 @@ export async function uploadChunk(
     fileStream:ReadableStream
 )
 {
-    return await fetch("http://localhost:3000/api/files/uploadChunk", {
+    return await fetch(`${baseURL}/api/files/uploadChunk`, {
         method: "POST",
         credentials: "include",
         headers: {
