@@ -84,7 +84,7 @@ router.get("/list", async (req, res) => {
             return res.status(400).json({error: "Failed to get requested path"});
         }
 
-        const parentId = Number(requestedPath.split('/').at(1)) || null;
+        const parentId:number | null = Number(requestedPath.split('/').filter(Boolean).at(-1));
         console.log("parentId", parentId);
 
         const result = await db()`
@@ -101,16 +101,16 @@ router.get("/list", async (req, res) => {
 
 
         interface response{
-            path: object[],
+            path: {id:string, name:string}[],
             items: object[]
         }
         let response:response = {
-                path:[],
-                items:[]
+            path: [],
+            items: []
 
         };
 
-        response.path.push(["Storage"]);
+        response.path.push({id:"0", name: "Storage"});
 
         for (const row of result){
             response.items.push({

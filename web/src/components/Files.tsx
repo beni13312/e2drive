@@ -33,28 +33,33 @@ function Files({onReady}:props) {
     const location = useLocation();
     const navigate = useNavigate();
 
-    const [path, setPath] = useState<Array<string>>([]);
+    const [path, setPath] = useState<Array<{id:string, name:string}>>([]);
     const [response, setResponse] = useState<response[]>([]);
+    const [errorMsg, setErrorMsg] = useState<string>("");
 
-    // get response
+    // Get response
     useEffect(()  => {
 
         const getFilesList = async ()=>{
-            const result = await listFiles();
-            if (!result.error && result.items && result.path){
+            console.log("Pathname: " + location.pathname);
+
+            const result = await listFiles(location.pathname);
+            if (result.items && result.path){
                 setResponse(result.items);
 
-                const urlPath = parseUrl(result.path);
+                const urlPath = parseUrl(result.path[0].name);
 
                 console.log("URL path: " + urlPath);
-                console.log("Response path:" + result.path);
+                console.log("Response path: " + result.path[0].name);
 
-                // navigate only if the pathname does not include the path already
-                if (location.pathname != urlPath){
+                // Navigate only if the pathname does not include the path already
+                if (!location.pathname.includes(urlPath)){
                     navigate(urlPath);
                 }
-                setPath(result.path);
+                setPath(result.path[0]);
 
+            }else if(result.error){
+                setErrorMsg(result.error);
             }
             console.log(response);
         }
@@ -64,21 +69,21 @@ function Files({onReady}:props) {
          if (onReady) onReady();
     }, []);
 
-    const handleItemClick = (e:MouseEvent, id:string, type:string, name:string)=> {
+    const handleItemClick = (e:MouseEvent<HTMLTableRowElement>, id:string, type:string, name:string)=> {
       console.log("clicked: " + id + ' ' + type);
 
       if (type === "folder"){
           const handleOpenFolder = async () => {
-              const urlPath = parseUrl(path);
+              const urlPath = parseUrl(path.map(item => item.id));
               const UrlPath = urlPath + '/' + id;
               const result = await listFiles(UrlPath);
               setResponse(result.items);
 
-              // navigate only if the pathname does not include the path already
+              // Navigate only if the pathname does not include the path already
               if (!location.pathname.includes(id)){
                   navigate(id);
               }
-              setPath(prev => [...prev, name]);
+              setPath(prev => [...prev, {id, name}]);
               console.log("Path: " + path);
               console.log(result);
           }
@@ -96,7 +101,8 @@ function Files({onReady}:props) {
                     {
                         path.map((segment, index) => (
                             <>
-                                <div className="m-1 p-1 cursor-pointer hover:bg-gray-200 rounded-lg">{segment}</div>
+                                {console.log("Segments: " + segment.name)}
+                                <div className="m-1 p-1 cursor-pointer hover:bg-gray-200 rounded-lg">{segment.name}</div>
                                 {index < path.length - 1 && (
                                     <div>/</div>
                                 )}
@@ -106,46 +112,50 @@ function Files({onReady}:props) {
                     }
                 </div>
             </div>
-            <table className="files-table table-auto border-collapse border-spacing-x-8">
-                <colgroup>
-                    <col className="w-auto"/>
-                    <col className="w-full"/>
-                    <col className="w-auto"/>
-                    <col className="w-auto"/>
-                </colgroup>
-                <thead>
-                <tr>
-                    <th className="text-left sticky top-15 shadow-[inset_0_-1px_0_0_#9ca3af] bg-app-card py-4"></th>
-                    <th className="text-left sticky top-15 shadow-[inset_0_-1px_0_0_#9ca3af] bg-app-card py-4">
-                        <div className="hover:bg-gray-200 rounded-lg cursor-pointer py-1 px-4">Name</div>
-                    </th>
-                    <th className="text-left sticky top-15 shadow-[inset_0_-1px_0_0_#9ca3af] bg-app-card py-4">
-                        <div className="hover:bg-gray-200 rounded-lg cursor-pointer py-1 px-4">Size</div>
-                    </th>
-                    <th className="text-left sticky top-15 shadow-[inset_0_-1px_0_0_#9ca3af] bg-app-card py-4">
-                        <div className="hover:bg-gray-200 rounded-lg cursor-pointer py-1 px-4">Date</div>
-                    </th>
-                </tr>
-                </thead>
-                <tbody>
-                {
-                    response.map((item) => (
-                        <tr onClick={(e) => handleItemClick(e, item.id, item.type, item.encryptedName)} id={item.id} className="hover:bg-gray-200 cursor-pointer">
-                            <td className="py-4 border-b border-gray-400 pl-4">
-                                {
-                                    item.type === "file" ? <FileIcon className="w-7 h-7"/> : <FolderIcon className="w-7 h-7"/>
-                                }
-                            </td>
-                            <td className="py-1 border-b border-gray-400 px-4">{item.encryptedName}</td> {/* set encrypted name for testing */}
-                            <td className="py-1 border-b border-gray-400 px-4">{item.size}B</td>
-                            <td className="py-1 border-b border-gray-400 px-4">{String(item.modDate).slice(0, 10).replaceAll('-', '.')}</td>
-                        </tr>
-                    ))
-                }
+            {
+                (errorMsg.length !== 0) ? (<div className="errorMsg text-2xl ml-5 mt-5">{errorMsg}</div>) :
+
+                <table className="files-table table-auto border-collapse border-spacing-x-8">
+                    <colgroup>
+                        <col className="w-auto"/>
+                        <col className="w-full"/>
+                        <col className="w-auto"/>
+                        <col className="w-auto"/>
+                    </colgroup>
+                    <thead>
+                    <tr>
+                        <th className="text-left sticky top-15 shadow-[inset_0_-1px_0_0_#9ca3af] bg-app-card py-4"></th>
+                        <th className="text-left sticky top-15 shadow-[inset_0_-1px_0_0_#9ca3af] bg-app-card py-4">
+                            <div className="hover:bg-gray-200 rounded-lg cursor-pointer py-1 px-4">Name</div>
+                        </th>
+                        <th className="text-left sticky top-15 shadow-[inset_0_-1px_0_0_#9ca3af] bg-app-card py-4">
+                            <div className="hover:bg-gray-200 rounded-lg cursor-pointer py-1 px-4">Size</div>
+                        </th>
+                        <th className="text-left sticky top-15 shadow-[inset_0_-1px_0_0_#9ca3af] bg-app-card py-4">
+                            <div className="hover:bg-gray-200 rounded-lg cursor-pointer py-1 px-4">Date</div>
+                        </th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {
+                        response.map((item) => (
+                            <tr onClick={(e) => handleItemClick(e, item.id, item.type, item.encryptedName)} key={item.id} id={item.id} className="hover:bg-gray-200 cursor-pointer">
+                                <td className="py-4 border-b border-gray-400 pl-4">
+                                    {
+                                        item.type === "file" ? <FileIcon className="w-7 h-7"/> : <FolderIcon className="w-7 h-7"/>
+                                    }
+                                </td>
+                                <td className="py-1 border-b border-gray-400 px-4">{item.encryptedName}</td>
+                                <td className="py-1 border-b border-gray-400 px-4">{item.size}B</td>
+                                <td className="py-1 border-b border-gray-400 px-4">{String(item.modDate).slice(0, 10).replaceAll('-', '.')}</td>
+                            </tr>
+                        ))
+                    }
 
 
-                </tbody>
-            </table>
+                    </tbody>
+                </table>
+            }
         </>
     );
 }
