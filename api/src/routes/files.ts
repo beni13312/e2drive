@@ -84,7 +84,7 @@ router.get("/list", async (req, res) => {
             return res.status(400).json({error: "Failed to get requested path"});
         }
 
-        const parentId:number | null = Number(requestedPath.split('/').filter(Boolean).at(-1));
+        const parentId:number | null = Number(requestedPath.split('/').filter(Boolean).at(-1)) || null;
         console.log("parentId", parentId);
 
         const result = await db()`
