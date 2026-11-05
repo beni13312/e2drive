@@ -1,7 +1,10 @@
+volumes:
+  database:
+
 services:
-  nginx:
+  web-server:
     image: nginx:latest
-    container_name: nginx
+    container_name: web-server
     ports:
       - "127.0.0.1:8080:80"
       - "127.0.0.1:4443:443"
@@ -10,14 +13,27 @@ services:
       - "./sites-enabled:/etc/nginx/sites-enabled:ro,Z"
       - "./certs:/etc/nginx/certs:ro,Z"
     depends_on:
-      - frontend
+      - web
+
+  database:
+    container_name: database
+    image: postgres:latest
+    shm_size: 128mb
+    volumes:
+      - "database:/var/lib/postgres/data"
+    environment:
+      - "POSTGRES_DB=app"
+      - "POSTGRES_USER=dev"
+      - "POSTGRES_PASSWORD=test123"
+    ports:
+      - "127.0.0.1:5432:5432"
 
   web:
     image: node:22-alpine
     container_name: web
     working_dir: /app
     volumes:
-      - ./frontend:/app
+      - ../web:/app
       - /app/node_modules
     command: sh -c "npm install && npm run dev -- --host 0.0.0.0"
     ports:
@@ -28,8 +44,8 @@ services:
     container_name: api
     working_dir: /app
     volumes:
-      - ./api:/app
+      - ../api:/app
       - /app/node_modules
     command: sh -c "npm install && npm run dev -- --host 0.0.0.0"
     ports:
-      - "127.0.0.1:5173:5173"
+      - "127.0.0.1:3000:3000"
