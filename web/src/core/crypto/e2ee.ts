@@ -31,7 +31,7 @@ export default class E2ee {
         buffer.set(generatedIV, 0);
         buffer.set(encryptData, 12);
 
-        return buffer
+        return buffer;
 
     }
 

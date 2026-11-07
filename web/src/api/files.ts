@@ -34,20 +34,19 @@ export async function listFiles(path:string = "/") {
 
 export async function uploadMetaData(
     path:string | null,
-    filename:Blob,
+    filename:string,
     size: string,
     modDate:string
 )
 {
     if(!path) path = "/";
 
-    const formData = new FormData();
-    formData.append("filename", filename);
-    formData.append("DataSize", size);
-    formData.append("modDate", modDate);
-
     return await api.post(`/api/files/uploadMetaData?path=${encodeURIComponent(path)}`,
-        formData
+        {
+            filename: new TextEncoder().encode(filename),
+            dataSize: size,
+            modDate: modDate
+        }
     ).then((res)=>{
         return res.data;
     }).catch((error) => {

@@ -1,15 +1,13 @@
 import {Router} from "express";
 import crypto from "node:crypto";
 import db from "../database/connection.js";
-import path from "node:path";
-import multer from "multer"
 import * as argon2 from "argon2";
 
 const router = Router();
 // use multer for getting data from formData
-const multerInit = multer({
-    storage: multer.memoryStorage()
-});
+// const multerInit = multer({
+//     storage: multer.memoryStorage()
+// });
 
 
 // using a simpler check for now
@@ -133,18 +131,17 @@ router.get("/list", async (req, res) => {
     }
 });
 
-router.post("/uploadMetadata", multerInit.single("filename"), async (req, res) => {
+router.post("/uploadMetadata", async (req, res) => {
     try{
         console.log("FilePath: " + req.query.path);
 
-        if(!req.files || !req.body){
+        if(!req.body){
             return res.status(400).json({error: "Failed to read request"});
         }
 
-        const files = req.files as {[filedname: string]: Express.Multer.File[]};
         const body = req.body;
 
-        const filenameBytes = files.filename[0].buffer;
+        const filenameBytes = body.filename
         const size = body.size;
         const modDate = new Date (Number(body.modDate));
 

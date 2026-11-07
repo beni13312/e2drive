@@ -9,7 +9,7 @@ interface props {
     onReady: () => void;
 }
 
-interface response{
+interface item{
     id: string,
     type: string,
     encryptedName: string,
@@ -17,27 +17,19 @@ interface response{
     modDate: string
 }
 
-function parseUrl (path:Array<string>): string{
-    let strUrl = "";
-    path.forEach((segment, index)=>{
-        strUrl += segment;
-        if(index < path.length - 1){
-            strUrl += '/';
-        }
-    });
-    return strUrl;
+function parseUrl(arrayPath: Array<string>):string{
+    return arrayPath.join('/');
 }
-
 
 function Files({onReady}:props) {
     const location = useLocation();
     const navigate = useNavigate();
 
     const [path, setPath] = useState<Array<{id:string, name:string}>>([]);
-    const [response, setResponse] = useState<response[]>([]);
+    const [items, setItems] = useState<item[]>([]);
     const [errorMsg, setErrorMsg] = useState<string>("");
 
-    // Get response
+    // Get files and folder metadata
     useEffect(()  => {
 
         const getFilesList = async ()=>{
@@ -45,12 +37,14 @@ function Files({onReady}:props) {
 
             const result = await listFiles(location.pathname);
             if (result.items && result.path){
-                setResponse(result.items);
+                setItems(result.items);
 
-                const urlPath = parseUrl(result.path[0].name);
+                const responsePath:Array<string> = result.path[0].name;
 
-                console.log("URL path: " + urlPath);
-                console.log("Response path: " + result.path[0].name);
+                const urlPath = parseUrl(responsePath);
+
+                console.log("Response path: " + responsePath);
+                console.log("URL parsed path: " + urlPath);
 
                 // Navigate only if the pathname does not include the path already
                 if (!location.pathname.includes(urlPath)){
@@ -61,23 +55,20 @@ function Files({onReady}:props) {
             }else if(result.error){
                 setErrorMsg(result.error);
             }
-            console.log(response);
+            console.log(items);
         }
 
         getFilesList();
         
          if (onReady) onReady();
-    }, []);
+    }, [location.pathname]);
 
     const handleItemClick = (e:MouseEvent<HTMLTableRowElement>, id:string, type:string, name:string)=> {
       console.log("clicked: " + id + ' ' + type);
 
       if (type === "folder"){
           const handleOpenFolder = async () => {
-              const urlPath = parseUrl(path.map(item => item.id));
-              const UrlPath = urlPath + '/' + id;
-              const result = await listFiles(UrlPath);
-              setResponse(result.items);
+              //const urlPath = parseUrl(path.map(item => item.id));
 
               // Navigate only if the pathname does not include the path already
               if (!location.pathname.includes(id)){
@@ -85,7 +76,6 @@ function Files({onReady}:props) {
               }
               setPath(prev => [...prev, {id, name}]);
               console.log("Path: " + path);
-              console.log(result);
           }
           handleOpenFolder();
       }
@@ -138,8 +128,8 @@ function Files({onReady}:props) {
                     </thead>
                     <tbody>
                     {
-                        response.map((item) => (
-                            <tr onClick={(e) => handleItemClick(e, item.id, item.type, item.encryptedName)} key={item.id} id={item.id} className="hover:bg-gray-200 cursor-pointer">
+                        items.map((item) => (
+                            <tr onClick={(e) => handleItemClick(e, item.id, item.type, item.encryptedName)} key={`${item.type}-${item.id}`} id={item.id} className="hover:bg-gray-200 cursor-pointer">
                                 <td className="py-4 border-b border-gray-400 pl-4">
                                     {
                                         item.type === "file" ? <FileIcon className="w-7 h-7"/> : <FolderIcon className="w-7 h-7"/>

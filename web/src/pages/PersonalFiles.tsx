@@ -77,8 +77,10 @@ function PersonalFiles({onLogout, encryptionKey}:props){
             console.log("Upload: " + f.name + "file size: " + Math.floor(f.size / 1024) + "KB");
 
             const encryptedFileName = await e2ee.encrypt(Uint8Array.from(f.name));
+            const base64EncryptedFileName = btoa(String.fromCodePoint(...encryptedFileName));
+            console.log("Base64FileName: " + base64EncryptedFileName);
 
-            const uploadFileInfo = await uploadMetaData(null, new Blob([encryptedFileName]), String(f.size), String(f.lastModified));
+            const uploadFileInfo = await uploadMetaData(null, base64EncryptedFileName, String(f.size), String(f.lastModified));
             if (uploadFileInfo.id){
                 // get ids from response to be able to upload the data
             }

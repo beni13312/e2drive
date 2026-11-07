@@ -5,12 +5,6 @@ select 1 from sessions where token='3dc11845f1e348d5d232427eecf726e84268523d0251
 SELECT users.password FROM users JOIN sessions ON sessions.user_id = users.id WHERE sessions.token='859b066d0aff65274c30d0bc021f07424116c75dd37460c2f23c5d5b10999ffb';
 
 truncate table sessions restart identity;
--- test data
--- password hashed with argon2id: test123
--- db: app
--- db user: dev
-
-insert into users (email, password, name) VALUES ('test@test.com', '$argon2id$v=19$m=65536,t=3,p=4$yyp+UxPKr1WsmIzhGQ4JmQ$vf4QxZy0ntOvxxnrXMG9/ILlg4VakpOZDshaBv1UZSg', 'Test John');
 
 -- list from root folder
 select id, encrypted_name, size, modified_at from files where parent_id is null;
