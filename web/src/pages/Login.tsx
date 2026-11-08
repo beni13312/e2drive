@@ -37,16 +37,16 @@ function Login({onLogin, setEncryptionPassword}:props){
             <div className="login-container max-w-sm w-full">
                 <div className="logo flex flex-col w-full pb-10 top-1">
                     <Logo className="flex ml-auto mr-auto size-60 translate-y-8"/>
-                    <div className="flex justify-center text-8xl text-[#183454]"><strong>E2</strong>Drive</div>
-                    <div className="flex justify-center text-[27.5px] text-[#183454]"><strong>END-TO-END-ENCRYPTED</strong></div>
+                    <div className="flex justify-center text-8xl text-logo-text"><strong>E2</strong>Drive</div>
+                    <div className="flex justify-center text-[27.5px] text-logo-text"><strong>END-TO-END-ENCRYPTED</strong></div>
 
                 </div>
                 <form onSubmit={handleSubmit}>
                     <div className="space-y-2">
-                            <input className="login-email border-2 border-gray-300 px-4 focus:outline-none focus:border-gray-400 rounded-lg h-12 w-full"
+                            <input className="login-email border-2 border-app-border px-4 focus:outline-none focus:border-gray-400 rounded-lg h-12 w-full"
                                    value={email} onChange={(e)=>
                             setEmail(e.target.value.toLowerCase())} type="email" placeholder="E-mail"/>
-                            <input className="login-password border-2 border-gray-300 px-4 focus:outline-none focus:border-gray-400 rounded-lg h-12 w-full"
+                            <input className="login-password border-2 border-app-border px-4 focus:outline-none focus:border-gray-400 rounded-lg h-12 w-full"
                                    value={password} onChange={(e)=>
                             setPassword(e.target.value)} type="password" placeholder="Password"/>
                             <input className="login-submit cursor-pointer hover:bg-cyan-400 bg-cyan-500 text-white text-lg font-bold rounded-lg h-10 w-full"

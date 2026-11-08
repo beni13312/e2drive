@@ -1,32 +1,51 @@
 @import "tailwindcss";
 
-@theme {
-    --color-brand-blue: #1a73e8;
-    --color-brand-blue-hover: #1557b0;
+/* defines the theme */
+@layer base {
+    :root {
+        --theme-color-app-bg: #f8fafc;
+        --theme-color-app-card: #ffffff;
+        --theme-color-app-text: #0f172a;
+        --theme-color-app-border: #e2e8f0;
+        --theme-color-app-hover: #e5e7eb;
 
-    --color-app-bg: #f8fafc;
-    --color-app-card: #ffffff;
-    --color-app-text: #0f172a;
-    --color-app-border: #e2e8f0;
+        --theme-color-brand-blue: #1a73e8;
+        --theme-color-brand-blue-hover: #1557b0;
+        --theme-color-logo-text: #183454;
+
+    }
+
+
+    @media (prefers-color-scheme: dark)  {
+        :root {
+            --theme-color-app-bg: #131314;
+            --theme-color-app-card: #1f1f20;
+            --theme-color-app-text: #e3e3e3;
+            --theme-color-app-border: #444746;
+            --theme-color-app-hover: #2a2b2d;
+
+            --theme-color-brand-blue: #a8c7fa;
+            --theme-color-brand-blue-hover: #c2e7ff;
+            --theme-color-logo-text: #6095d1;
+        }
+    }
 }
 
-@variant dark (prefers-color-scheme: dark);
+/* theme variables for tailwind */
+@theme {
+    --color-app-bg: var(--theme-color-app-bg);
+    --color-app-card: var(--theme-color-app-card);
+    --color-app-text: var(--theme-color-app-text);
+    --color-app-border: var(--theme-color-app-border);
+    --color-app-hover: var(--theme-color-app-hover);
 
-@layer base {
-    :root:light {
-        --color-app-bg: #131314;
-        --color-app-card: #1f1f20;
-        --color-app-text: #e3e3e3;
-        --color-app-border: #444746;
-
-        --color-brand-blue: #a8c7fa;
-        --color-brand-blue-hover: #c2e7ff;
-    }
+    --color-brand-blue: var(--theme-color-brand-blue);
+    --color-brand-blue-hover: var(--theme-color-brand-blue-hover);
+    --color-logo-text: var(--theme-color-logo-text);
 }
 
 body {
     background-color: var(--color-app-bg);
     color: var(--color-app-text);
-    transition: background-color 0.2s ease, color 0.2s ease;
     user-select: none;
 }

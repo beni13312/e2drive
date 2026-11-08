@@ -114,30 +114,30 @@ function Files({onReady}:props) {
                     </colgroup>
                     <thead>
                     <tr>
-                        <th className="text-left sticky top-15 shadow-[inset_0_-1px_0_0_#9ca3af] bg-app-card py-4"></th>
-                        <th className="text-left sticky top-15 shadow-[inset_0_-1px_0_0_#9ca3af] bg-app-card py-4">
-                            <div className="hover:bg-gray-200 rounded-lg cursor-pointer py-1 px-4">Name</div>
+                        <th className="text-left sticky top-15 shadow-[inset_0_-1px_0_0_var(--color-app-border)] bg-app-card py-4"></th>
+                        <th className="text-left sticky top-15 shadow-[inset_0_-1px_0_0_var(--color-app-border)] bg-app-card py-4">
+                            <div className="hover:bg-app-hover rounded-lg cursor-pointer py-1 px-4">Name</div>
                         </th>
-                        <th className="text-left sticky top-15 shadow-[inset_0_-1px_0_0_#9ca3af] bg-app-card py-4">
-                            <div className="hover:bg-gray-200 rounded-lg cursor-pointer py-1 px-4">Size</div>
+                        <th className="text-left sticky top-15 shadow-[inset_0_-1px_0_0_var(--color-app-border)] bg-app-card py-4">
+                            <div className="hover:bg-app-hover rounded-lg cursor-pointer py-1 px-4">Size</div>
                         </th>
-                        <th className="text-left sticky top-15 shadow-[inset_0_-1px_0_0_#9ca3af] bg-app-card py-4">
-                            <div className="hover:bg-gray-200 rounded-lg cursor-pointer py-1 px-4">Date</div>
+                        <th className="text-left sticky top-15 shadow-[inset_0_-1px_0_0_var(--color-app-border)] bg-app-card py-4">
+                            <div className="hover:bg-app-hover rounded-lg cursor-pointer py-1 px-4">Date</div>
                         </th>
                     </tr>
                     </thead>
                     <tbody>
                     {
                         items.map((item) => (
-                            <tr onClick={(e) => handleItemClick(e, item.id, item.type, item.encryptedName)} key={`${item.type}-${item.id}`} id={item.id} className="hover:bg-gray-200 cursor-pointer">
-                                <td className="py-4 border-b border-gray-400 pl-4">
+                            <tr onClick={(e) => handleItemClick(e, item.id, item.type, item.encryptedName)} key={`${item.type}-${item.id}`} id={item.id} className="hover:bg-app-hover cursor-pointer">
+                                <td className="py-4 border-b border-app-border pl-4">
                                     {
                                         item.type === "file" ? <FileIcon className="w-7 h-7"/> : <FolderIcon className="w-7 h-7"/>
                                     }
                                 </td>
-                                <td className="py-1 border-b border-gray-400 px-4">{item.encryptedName}</td>
-                                <td className="py-1 border-b border-gray-400 px-4">{item.size}B</td>
-                                <td className="py-1 border-b border-gray-400 px-4">{String(item.modDate).slice(0, 10).replaceAll('-', '.')}</td>
+                                <td className="py-1 border-b border-app-border px-4">{item.encryptedName}</td>
+                                <td className="py-1 border-b border-app-border px-4">{item.size}B</td>
+                                <td className="py-1 border-b border-app-border px-4">{String(item.modDate).slice(0, 10).replaceAll('-', '.')}</td>
                             </tr>
                         ))
                     }
