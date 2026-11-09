@@ -4,11 +4,6 @@ import db from "../database/connection.js";
 import * as argon2 from "argon2";
 
 const router = Router();
-// use multer for getting data from formData
-// const multerInit = multer({
-//     storage: multer.memoryStorage()
-// });
-
 
 // using a simpler check for now
 router.post("/checkEncryptionPassword", async (req, res) => {
@@ -83,34 +78,68 @@ router.get("/list", async (req, res) => {
         }
 
         const parentId:number | null = Number(requestedPath.split('/').filter(Boolean).at(-1)) || null;
+        const urlFolderPathArray:string[] = requestedPath.split('/'); // TODO fix URL splitting
         console.log("parentId", parentId);
 
-        const result = await db()`
+        interface DbResponse{
+            path: {
+                id: string,
+                encrypted_name: Buffer
+            }[],
+            items: {
+                id: string,
+                type: string,
+                encrypted_name: Buffer,
+                size: string,
+                modified_at: string
+
+            }[]
+        }
+
+        const result = await db()<DbResponse[]>`
                             WITH "current_user" AS (
                               SELECT users.id from users 
                               JOIN sessions ON sessions.user_id = users.id WHERE sessions.token = ${tokenHash}
-                            )
+                            ),
+
+                            -- get filepath
+                            folderPath AS (
+                                SELECT id, encrypted_name
+                                FROM folders WHERE  id=ANY(${urlFolderPathArray}::text[])
+                                AND owner_id=(SELECT id FROM "current_user")
+                            ),
                             
-                            SELECT id, 'file' AS type, encrypted_name, size, modified_at FROM files WHERE parent_id IS NOT DISTINCT FROM ${parentId} 
-                            AND owner_id=(SELECT id FROM "current_user")
-                              UNION ALL
-                            SELECT id, 'folder' AS type,encrypted_name, size, modified_at FROM folders WHERE parent_id IS NOT DISTINCT FROM ${parentId}
-                            AND owner_id=(SELECT id FROM "current_user");`;
+                            -- get files and folders
+                            folderItems AS (
+                                SELECT id, 'file' AS type, encrypted_name, size, modified_at 
+                                FROM files WHERE parent_id IS NOT DISTINCT FROM ${parentId} 
+                                AND owner_id=(SELECT id FROM "current_user")
+                                  UNION ALL
+                                SELECT id, 'folder' AS type, encrypted_name, size, modified_at 
+                                FROM folders WHERE parent_id IS NOT DISTINCT FROM ${parentId}
+                                AND owner_id=(SELECT id FROM "current_user")
+                                )
+                            
+                            SELECT 
+                            COALESCE(
+                                (SELECT json_agg(folderPath) FROM folderPath), '[]'::json
+                            ) AS path,   
+                            COALESCE(
+                                (SELECT json_agg(folderItems) FROM folderItems), '[]'::json
+                            ) AS items;
+                            `;
 
 
-        interface response{
-            path: {id:string, name:string}[],
-            items: object[]
-        }
-        let response:response = {
+
+        let response:{path:object[], items:object[]} = {
             path: [],
             items: []
 
         };
 
-        response.path.push({id:"0", name: "Storage"});
+        response.path.push(...result[0].path);
 
-        for (const row of result){
+        for (const row of result[0].items){
             response.items.push({
                 id: row["id"],
                 type: row["type"],

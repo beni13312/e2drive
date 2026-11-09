@@ -9,12 +9,17 @@ interface props {
     onReady: () => void;
 }
 
-interface item{
+interface fileItem{
     id: string,
     type: string,
     encryptedName: string,
     size: string,
     modDate: string
+}
+
+interface filePath{
+    id: string,
+    name:string
 }
 
 function parseUrl(arrayPath: Array<string>):string{
@@ -25,33 +30,28 @@ function Files({onReady}:props) {
     const location = useLocation();
     const navigate = useNavigate();
 
-    const [path, setPath] = useState<Array<{id:string, name:string}>>([]);
-    const [items, setItems] = useState<item[]>([]);
+    const [path, setPath] = useState<filePath[]>([]);
+    const [items, setItems] = useState<fileItem[]>([]);
     const [errorMsg, setErrorMsg] = useState<string>("");
 
     // Get files and folder metadata
     useEffect(()  => {
-
         const getFilesList = async ()=>{
             console.log("Pathname: " + location.pathname);
 
-            const result = await listFiles(location.pathname);
+            const result:{path?: filePath[], items?: fileItem[], error?:string} = await listFiles(location.pathname);
             if (result.items && result.path){
+                setPath(result.path);
                 setItems(result.items);
 
-                const responsePath:Array<string> = result.path[0].name;
+                const urlPath = parseUrl(result.path.map(segment => segment.name));
 
-                const urlPath = parseUrl(responsePath);
-
-                console.log("Response path: " + responsePath);
                 console.log("URL parsed path: " + urlPath);
 
                 // Navigate only if the pathname does not include the path already
                 if (!location.pathname.includes(urlPath)){
                     navigate(urlPath);
                 }
-                setPath(result.path[0]);
-
             }else if(result.error){
                 setErrorMsg(result.error);
             }
@@ -68,8 +68,6 @@ function Files({onReady}:props) {
 
       if (type === "folder"){
           const handleOpenFolder = async () => {
-              //const urlPath = parseUrl(path.map(item => item.id));
-
               // Navigate only if the pathname does not include the path already
               if (!location.pathname.includes(id)){
                   navigate(id);
@@ -92,7 +90,7 @@ function Files({onReady}:props) {
                         path.map((segment, index) => (
                             <>
                                 {console.log("Segments: " + segment.name)}
-                                <div className="m-1 p-1 cursor-pointer hover:bg-gray-200 rounded-lg">{segment.name}</div>
+                                <div className="m-1 p-1 cursor-pointer hover:bg-app-hover rounded-lg text-app-text" id={segment.id} key={segment.id}>{segment.name}</div>
                                 {index < path.length - 1 && (
                                     <div>/</div>
                                 )}
