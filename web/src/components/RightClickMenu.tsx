@@ -32,9 +32,9 @@ export function RightClickMenu({ref, eventState, fileObject, posX, posY}:props){
           <UploadFile ref={uploadFileRef} eventState={()=> eventState()} fileObject={fileObject}/>
           <UploadFolder ref={uploadFolderRef} eventState={()=> eventState()} fileObject={fileObject}/>
           <ul>
-              <li className="pl-5 p-2 hover:bg-gray-200 hover:rounded-lg cursor-pointer">New folder</li>
-              <li onClick={handleFileUpload} className="pl-5 p-2 hover:bg-gray-200 hover:rounded-lg cursor-pointer">File upload</li>
-              <li onClick={handleFolderUpload} className="pl-5 p-2 hover:bg-gray-200 hover:rounded-lg cursor-pointer">Folder upload</li>
+              <li className="pl-5 p-2 hover:bg-app-hover hover:rounded-lg cursor-pointer">New folder</li>
+              <li onClick={handleFileUpload} className="pl-5 p-2 hover:bg-app-hover hover:rounded-lg cursor-pointer">File upload</li>
+              <li onClick={handleFolderUpload} className="pl-5 p-2 hover:bg-app-hover hover:rounded-lg cursor-pointer">Folder upload</li>
           </ul>
       </div>
     );
@@ -51,9 +51,9 @@ export function RightClickMenuOnEntry({ref, eventState, fileObject, posX, posY}:
                  }
              }>
             <ul>
-                <li className="pl-5 p-2 hover:bg-gray-200 hover:rounded-lg cursor-pointer">View</li>
-                <li className="pl-5 p-2 hover:bg-gray-200 hover:rounded-lg cursor-pointer">Rename</li>
-                <li className="pl-5 p-2 hover:bg-gray-200 hover:rounded-lg cursor-pointer">Download</li>
+                <li className="pl-5 p-2 hover:bg-app-hover hover:rounded-lg cursor-pointer">View</li>
+                <li className="pl-5 p-2 hover:bg-app-hover hover:rounded-lg cursor-pointer">Rename</li>
+                <li className="pl-5 p-2 hover:bg-app-hover hover:rounded-lg cursor-pointer">Download</li>
             </ul>
         </div>
     );

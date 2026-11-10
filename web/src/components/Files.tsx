@@ -19,7 +19,7 @@ interface fileItem{
 
 interface filePath{
     id: string,
-    name:string
+    encryptedName:string
 }
 
 function parseUrl(arrayPath: Array<string>):string{
@@ -30,21 +30,27 @@ function Files({onReady}:props) {
     const location = useLocation();
     const navigate = useNavigate();
 
-    const [path, setPath] = useState<filePath[]>([]);
+    const [path, setPath] = useState<filePath[]>([
+        {id:"0", encryptedName: "Storage"} // the root placeholder
+    ]);
     const [items, setItems] = useState<fileItem[]>([]);
     const [errorMsg, setErrorMsg] = useState<string>("");
 
-    // Get files and folder metadata
+    // Get file and folder metadata
     useEffect(()  => {
         const getFilesList = async ()=>{
-            console.log("Pathname: " + location.pathname);
+            const urlPath = location.pathname.replace("/files", "");
+            console.log("Pathname: " + urlPath);
 
-            const result:{path?: filePath[], items?: fileItem[], error?:string} = await listFiles(location.pathname);
+            const result:{path?: filePath[], items?: fileItem[], error?:string} = await listFiles(urlPath);
             if (result.items && result.path){
-                setPath(result.path);
+                setPath([
+                    {id:"0", encryptedName: "Storage"},
+                    ...result.path
+                ]);
                 setItems(result.items);
 
-                const urlPath = parseUrl(result.path.map(segment => segment.name));
+                const urlPath = parseUrl(result.path.map(segment => segment.id));
 
                 console.log("URL parsed path: " + urlPath);
 
@@ -55,7 +61,8 @@ function Files({onReady}:props) {
             }else if(result.error){
                 setErrorMsg(result.error);
             }
-            console.log(items);
+            console.log(result.path);
+            console.log(result.items);
         }
 
         getFilesList();
@@ -63,34 +70,55 @@ function Files({onReady}:props) {
          if (onReady) onReady();
     }, [location.pathname]);
 
-    const handleItemClick = (e:MouseEvent<HTMLTableRowElement>, id:string, type:string, name:string)=> {
+
+    // update page title
+    useEffect(()=>{
+        const currentPath = path[path.length -1];
+
+        document.title = currentPath ? `E2Drive - ${currentPath.encryptedName}` : "E2Drive - Storage"
+    }, [path]);
+
+
+    const handlePathClick = (e, id:string) =>{
+        console.log("clicked path: " + id);
+
+        if (id == "0"){
+            navigate("/files");
+        }
+        if (location.pathname.includes(id)){
+            console.log("ID: " + id);
+            navigate(`/files/${id}`);
+        }
+    };
+
+    const handleItemClick = (e:MouseEvent<HTMLTableRowElement>, id:string, type:string)=> {
       console.log("clicked: " + id + ' ' + type);
 
       if (type === "folder"){
-          const handleOpenFolder = async () => {
-              // Navigate only if the pathname does not include the path already
-              if (!location.pathname.includes(id)){
-                  navigate(id);
-              }
-              setPath(prev => [...prev, {id, name}]);
-              console.log("Path: " + path);
+          // Navigate only if the pathname does not include the path already
+          if (!location.pathname.includes(id)){
+              console.log("ID: " + id);
+              navigate(`${id}`);
           }
-          handleOpenFolder();
       }
+    };
+
+    const handleNewClick = (e:MouseEvent)=>{
+        console.log("New clicked");
+        // TODO: make the button work
     };
 
     return (
         <>
             <div className="storage-path-container flex w-full h-15 sticky top-0 bg-app-card">
-                <button className="new-button flex ml-5 text-xl items-center justify-center cursor-pointer text-white rounded-lg m-2 w-20 h-11 bg-cyan-500 hover:bg-cyan-400">
+                <button onClick={e => handleNewClick(e)} className="new-button flex ml-5 text-xl items-center justify-center cursor-pointer text-white rounded-lg m-2 w-20 h-11 bg-cyan-500 hover:bg-cyan-400">
                      <AddIcon className="fill-white"/> New
                 </button>
-                <div className="storage-path flex ml-5 text-2xl text-gray-600 items-center">
+                <div className="storage-path flex ml-5 text-2xl text-app-text items-center">
                     {
                         path.map((segment, index) => (
                             <>
-                                {console.log("Segments: " + segment.name)}
-                                <div className="m-1 p-1 cursor-pointer hover:bg-app-hover rounded-lg text-app-text" id={segment.id} key={segment.id}>{segment.name}</div>
+                                <div onClick={e => handlePathClick(e, segment.id)} className="m-1 p-1 cursor-pointer hover:bg-app-hover rounded-lg text-app-text" id={segment.id} key={segment.id}>{segment.encryptedName}</div>
                                 {index < path.length - 1 && (
                                     <div>/</div>
                                 )}
@@ -127,7 +155,7 @@ function Files({onReady}:props) {
                     <tbody>
                     {
                         items.map((item) => (
-                            <tr onClick={(e) => handleItemClick(e, item.id, item.type, item.encryptedName)} key={`${item.type}-${item.id}`} id={item.id} className="hover:bg-app-hover cursor-pointer">
+                            <tr onClick={(e) => handleItemClick(e, item.id, item.type)} key={`${item.type}-${item.id}`} id={item.id} className="hover:bg-app-hover cursor-pointer">
                                 <td className="py-4 border-b border-app-border pl-4">
                                     {
                                         item.type === "file" ? <FileIcon className="w-7 h-7"/> : <FolderIcon className="w-7 h-7"/>

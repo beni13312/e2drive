@@ -21,7 +21,8 @@ export async function getEmail(){
     });
 }
 
-export async function listFiles(path:string = "/") {
+export async function listFiles(path:string | null) {
+    if(!path) path = '/';
     return await api.get(`/api/files/list?path=${encodeURIComponent(path)}`, {
 
     }).then((res)=>{

@@ -78,8 +78,9 @@ router.get("/list", async (req, res) => {
         }
 
         const parentId:number | null = Number(requestedPath.split('/').filter(Boolean).at(-1)) || null;
-        const urlFolderPathArray:string[] = requestedPath.split('/'); // TODO fix URL splitting
+        const urlFolderPathArray:number[] = requestedPath.split('/').map(e => Number(e));
         console.log("parentId", parentId);
+        console.log("urlFolderPathArray: " + urlFolderPathArray);
 
         interface DbResponse{
             path: {
@@ -89,7 +90,7 @@ router.get("/list", async (req, res) => {
             items: {
                 id: string,
                 type: string,
-                encrypted_name: Buffer,
+                encrypted_name: string,
                 size: string,
                 modified_at: string
 
@@ -102,20 +103,20 @@ router.get("/list", async (req, res) => {
                               JOIN sessions ON sessions.user_id = users.id WHERE sessions.token = ${tokenHash}
                             ),
 
-                            -- get filepath
+                            -- get folder path
                             folderPath AS (
-                                SELECT id, encrypted_name
-                                FROM folders WHERE  id=ANY(${urlFolderPathArray}::text[])
+                                SELECT id, encode(encrypted_name, 'base64') as encrypted_name
+                                FROM folders WHERE  id=ANY(${urlFolderPathArray}::BIGINT[])
                                 AND owner_id=(SELECT id FROM "current_user")
                             ),
                             
                             -- get files and folders
                             folderItems AS (
-                                SELECT id, 'file' AS type, encrypted_name, size, modified_at 
+                                SELECT id, 'file' AS type, encode(encrypted_name, 'base64') as encrypted_name, size, modified_at 
                                 FROM files WHERE parent_id IS NOT DISTINCT FROM ${parentId} 
                                 AND owner_id=(SELECT id FROM "current_user")
                                   UNION ALL
-                                SELECT id, 'folder' AS type, encrypted_name, size, modified_at 
+                                SELECT id, 'folder' AS type, encode(encrypted_name, 'base64') as encrypted_name, size, modified_at 
                                 FROM folders WHERE parent_id IS NOT DISTINCT FROM ${parentId}
                                 AND owner_id=(SELECT id FROM "current_user")
                                 )
@@ -137,15 +138,21 @@ router.get("/list", async (req, res) => {
 
         };
 
-        response.path.push(...result[0].path);
+        const dbResult = result[0];
 
-        for (const row of result[0].items){
+        for (const row of dbResult.path){
+            response.path.push({
+                id: row.id,
+                encryptedName: row.encrypted_name,
+            });
+        }
+        for (const row of dbResult.items){
             response.items.push({
-                id: row["id"],
-                type: row["type"],
-                encryptedName: (row["encrypted_name"] as Buffer).toString("base64"),
-                size: row["size"],
-                modDate: row["modified_at"]
+                id: row.id,
+                type: row.type,
+                encryptedName: row.encrypted_name,
+                size: row.size,
+                modDate: row.modified_at
             });
         }
         if(response) {
