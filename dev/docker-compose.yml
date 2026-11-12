@@ -19,10 +19,10 @@ services:
 
   database:
     container_name: database
-    image: postgres:latest
+    image: postgres:18
     shm_size: 128mb
     volumes:
-      - "database:/var/lib/postgres/data"
+      - "database:/var/lib/postgres"
     environment:
       - "POSTGRES_DB=app"
       - "POSTGRES_USER=dev"
