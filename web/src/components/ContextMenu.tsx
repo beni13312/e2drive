@@ -1,4 +1,4 @@
-import React, {useRef} from "react";
+import React, {useLayoutEffect, useRef} from "react";
 import {UploadFile, UploadFolder} from "./Upload.tsx";
 
 interface props {
@@ -9,7 +9,7 @@ interface props {
     posY: number
 }
 
-export function RightClickMenu({ref, eventState, fileObject, posX, posY}:props){
+export function ContextMenu({ref, eventState, fileObject, posX, posY}:props){
 
     const uploadFileRef = useRef<HTMLInputElement>(null);
     const uploadFolderRef = useRef<HTMLInputElement>(null);
@@ -21,8 +21,14 @@ export function RightClickMenu({ref, eventState, fileObject, posX, posY}:props){
         uploadFolderRef.current?.click();
     }
 
+    useLayoutEffect(()=>{
+        if(ref.current) return;
+
+
+    },[ref, posX, posY])
+
     return (
-      <div ref={ref} className="right-click-menu rounded-lg absolute bg-app-card shadow-[4px_4px_8px_rgba(0,0,0,0.15)] w-50"
+      <div ref={ref} className="right-click-menu rounded-lg absolute bg-app-card shadow-[4px_4px_8px_rgba(0,0,0,0.15)] w-50 z-10"
       style={
           {
               left: posX,
@@ -40,7 +46,7 @@ export function RightClickMenu({ref, eventState, fileObject, posX, posY}:props){
     );
 }
 
-export function RightClickMenuOnEntry({ref, eventState, fileObject, posX, posY}:props){
+export function ContextMenuOnEntry({ref, eventState, fileObject, posX, posY}:props){
 
     return (
         <div ref={ref} className="right-click-menu rounded-lg absolute bg-app-card shadow-[4px_4px_8px_rgba(0,0,0,0.15)] w-50"

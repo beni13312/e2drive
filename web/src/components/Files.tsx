@@ -1,12 +1,14 @@
-import {useEffect, useState} from "react";
+import React, {useEffect, useRef, useState} from "react";
 import {useNavigate, useLocation} from "react-router-dom";
 import {listFiles} from "../api/files.ts";
 import AddIcon from "../assets/icons/add.svg?react";
 import FileIcon from "../assets/icons/draft.svg?react";
 import FolderIcon from "../assets/icons/folder.svg?react";
+import {ContextMenu} from "./ContextMenu.tsx";
 
 interface props {
     onReady: () => void;
+    handleUpload: (upload: FileList | null) => void;
 }
 
 interface fileItem{
@@ -26,15 +28,23 @@ function parseUrl(arrayPath: Array<string>):string{
     return arrayPath.join('/');
 }
 
-function Files({onReady}:props) {
+function Files({onReady, handleUpload}:props) {
     const location = useLocation();
     const navigate = useNavigate();
 
     const [path, setPath] = useState<filePath[]>([
         {id:"0", encryptedName: "Storage"} // the root placeholder
     ]);
+
+    const [rightClickMenu, setRightClickMenu] = useState({
+        visible: false,
+        x: 0,
+        y: 0
+    });
     const [items, setItems] = useState<fileItem[]>([]);
     const [errorMsg, setErrorMsg] = useState<string>("");
+
+    const rightClickMenuRef = useRef<HTMLDivElement>(null);
 
     // Get file and folder metadata
     useEffect(()  => {
@@ -96,7 +106,7 @@ function Files({onReady}:props) {
 
       if (type === "folder"){
           // Navigate only if the pathname does not include the path already
-          if (!location.pathname.includes(id)){
+          if (location.pathname != location.pathname + id){
               console.log("ID: " + id);
               navigate(`${id}`);
           }
@@ -108,8 +118,42 @@ function Files({onReady}:props) {
         // TODO: make the button work
     };
 
+    const handleRightClickMenu = (e:React.MouseEvent)=>{
+        e.preventDefault();
+
+        setRightClickMenu({
+            visible: true,
+            x: e.clientX,
+            y: e.clientY
+        });
+    };
+
+    const handleRightClickMenuClose = () =>{
+        setRightClickMenu({
+            visible: false,
+            x: 0,
+            y: 0
+        });
+    }
+
+    // Make context menu close when interaction happening outside
+    useEffect(() => {
+        const outOfRightClickMenu = (e:MouseEvent)=> {
+            if(rightClickMenuRef.current && !rightClickMenuRef.current.contains(e.target as Node)){
+                handleRightClickMenuClose();
+            }
+        }
+        document.addEventListener("mousedown", outOfRightClickMenu);
+        return () => {
+            document.removeEventListener("mousedown", outOfRightClickMenu);
+        }
+    }, []);
+
     return (
-        <>
+        <div className="files-container h-full overflow-auto pl-5 pb-5 pr-5 m-5 border border-app-border rounded-lg bg-app-card" onContextMenu={(e) =>{handleRightClickMenu(e)}}>
+            {
+                rightClickMenu.visible && <ContextMenu ref={rightClickMenuRef} eventState={()=> handleRightClickMenuClose()} fileObject={handleUpload} posX={rightClickMenu.x} posY={rightClickMenu.y}/>
+            }
             <div className="storage-path-container flex w-full h-15 sticky top-0 bg-app-card">
                 <button onClick={e => handleNewClick(e)} className="new-button flex ml-5 text-xl items-center justify-center cursor-pointer text-white rounded-lg m-2 w-20 h-11 bg-cyan-500 hover:bg-cyan-400">
                      <AddIcon className="fill-white"/> New
@@ -172,7 +216,7 @@ function Files({onReady}:props) {
                     </tbody>
                 </table>
             }
-        </>
+        </div>
     );
 }
 

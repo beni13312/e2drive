@@ -4,7 +4,6 @@ import React, {useEffect, useState, useRef} from "react";
 import {logout} from "../api/auth.ts";
 import {uploadMetaData, uploadChunk} from "../api/files.ts";
 import Loading from "../components/Loading.tsx";
-import {RightClickMenu} from "../components/RightClickMenu.tsx";
 import E2ee from "../core/crypto/e2ee.ts";
 import {getProfileName} from "../api/profile.ts";
 import Logo from "../assets/logo/logo.svg?react";
@@ -20,14 +19,8 @@ function PersonalFiles({onLogout, encryptionKey}:props){
     const [isLoaded, setIsLoaded] = useState(false);
     const [profileName, setProfileName] = useState("");
     const [isProfileDropDown, setProfileDropDown] = useState(false);
-    const [rightClickMenu, setRightClickMenu] = useState({
-        visible: false,
-        x: 0,
-        y: 0
-    });
 
     const profileDropDownRef = useRef<HTMLLIElement>(null);
-    const rightClickMenuRef = useRef<HTMLDivElement>(null);
 
     const handleProfileName = async ()=>{
             const result = await getProfileName();
@@ -48,23 +41,7 @@ function PersonalFiles({onLogout, encryptionKey}:props){
 
     };
 
-    const handleRightClickMenu = (e:React.MouseEvent)=>{
-        e.preventDefault();
 
-        setRightClickMenu({
-            visible: true,
-            x: e.clientX,
-            y: e.clientY
-        });
-    };
-
-    const handleRightClickMenuClose = () =>{
-        setRightClickMenu({
-            visible: false,
-            x: 0,
-            y: 0
-        });
-    }
 
     const handleUpload = async (upload: FileList | null)=>{
         if (!upload) return;
@@ -82,7 +59,7 @@ function PersonalFiles({onLogout, encryptionKey}:props){
 
             const uploadFileInfo = await uploadMetaData(null, base64EncryptedFileName, String(f.size), String(f.lastModified));
             if (uploadFileInfo.id){
-                // get ids from response to be able to upload the data
+                // Get ids from response to be able to upload the data
             }
 
             let bufferSize = 64 * 1024 // 64KB
@@ -135,18 +112,6 @@ function PersonalFiles({onLogout, encryptionKey}:props){
         }
     }, []);
 
-    // make right click menu close when interaction happening outside
-    useEffect(() => {
-        const outOfRightClickMenu = (e:MouseEvent)=> {
-            if(rightClickMenuRef.current && !rightClickMenuRef.current.contains(e.target as Node)){
-                handleRightClickMenuClose();
-            }
-        }
-        document.addEventListener("mousedown", outOfRightClickMenu);
-        return () => {
-            document.removeEventListener("mousedown", outOfRightClickMenu);
-        }
-    }, []);
 
 
     return (
@@ -182,12 +147,7 @@ function PersonalFiles({onLogout, encryptionKey}:props){
                         </ul>
                     </header>
                     <main className="main w-full min-h-0 flex-1 mb-10">
-                        <div className="files-container h-full overflow-auto pl-5 pb-5 pr-5 m-5 border border-app-border rounded-lg bg-app-card" onContextMenu={(e) =>{handleRightClickMenu(e)}}>
-                           <Files onReady={()=> setIsLoaded(true)} />
-                            {
-                                rightClickMenu.visible && <RightClickMenu ref={rightClickMenuRef} eventState={()=> handleRightClickMenuClose()} fileObject={handleUpload} posX={rightClickMenu.x} posY={rightClickMenu.y}/>
-                            }
-                        </div>
+                           <Files onReady={()=> setIsLoaded(true)} handleUpload={handleUpload} />
                     </main>
 
             </div>
