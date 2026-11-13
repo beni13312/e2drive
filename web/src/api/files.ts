@@ -1,7 +1,7 @@
 import {baseURL, api} from "./api.ts";
 
 export async function checkEncryptionPassword(password: string) {
-    return await api.post("/api/files/checkEncryptionPassword", {
+    return await api.post("/api/storage/checkEncryptionPassword", {
         password: password,
     }).then((res)=>{
         return res.data;
@@ -12,7 +12,7 @@ export async function checkEncryptionPassword(password: string) {
 }
 
 export async function getEmail(){
-    return await api.get("/api/files/getEmail", {
+    return await api.get("/api/storage/getEmail", {
     }).then((res)=>{
         return res.data;
     }).catch((error) => {
@@ -23,7 +23,7 @@ export async function getEmail(){
 
 export async function listFiles(path:string | null) {
     if(!path) path = '/';
-    return await api.get(`/api/files/list?path=${encodeURIComponent(path)}`, {
+    return await api.get(`/api/storage/list?path=${encodeURIComponent(path)}`, {
 
     }).then((res)=>{
         return res.data;
@@ -42,7 +42,7 @@ export async function uploadMetaData(
 {
     if(!path) path = "/";
 
-    return await api.post(`/api/files/uploadMetaData?path=${encodeURIComponent(path)}`,
+    return await api.post(`/api/storage/uploadMetaData?path=${encodeURIComponent(path)}`,
         {
             filename: new TextEncoder().encode(filename),
             dataSize: size,
@@ -60,7 +60,7 @@ export async function uploadChunk(
     fileStream:ReadableStream
 )
 {
-    return await fetch(`${baseURL}/api/files/uploadChunk`, {
+    return await fetch(`${baseURL}/api/storage/uploadChunk`, {
         method: "POST",
         credentials: "include",
         headers: {
@@ -80,7 +80,7 @@ export async function uploadChunk(
 export async function downloadFiles(path:string | null) {
     if(!path) path = "/";
 
-    return await api.get(`/api/files/download?path=${encodeURIComponent(path)}`
+    return await api.get(`/api/storage/download?path=${encodeURIComponent(path)}`
     ).then((res)=>{
         return res.data;
     }).catch((error) => {

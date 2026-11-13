@@ -26,7 +26,7 @@ function Login({onLogin, setEncryptionPassword}:props){
         const result = await login(email, password);
         if (result.login){
             onLogin();
-            navigate("/files");
+            navigate("/storage");
         }else{
             setErrorMsg(result.error);
         }

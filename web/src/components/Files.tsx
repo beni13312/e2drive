@@ -4,7 +4,7 @@ import {listFiles} from "../api/files.ts";
 import AddIcon from "../assets/icons/add.svg?react";
 import FileIcon from "../assets/icons/draft.svg?react";
 import FolderIcon from "../assets/icons/folder.svg?react";
-import {ContextMenu} from "./ContextMenu.tsx";
+import ContextMenu from "./ContextMenu.tsx";
 
 interface props {
     onReady: () => void;
@@ -36,20 +36,21 @@ function Files({onReady, handleUpload}:props) {
         {id:"0", encryptedName: "Storage"} // the root placeholder
     ]);
 
-    const [rightClickMenu, setRightClickMenu] = useState({
+    const [contextMenu, setContextMenu] = useState({
         visible: false,
         x: 0,
-        y: 0
+        y: 0,
+        type: ""
     });
     const [items, setItems] = useState<fileItem[]>([]);
     const [errorMsg, setErrorMsg] = useState<string>("");
 
-    const rightClickMenuRef = useRef<HTMLDivElement>(null);
+    const contextMenuRef = useRef<HTMLDivElement>(null);
 
     // Get file and folder metadata
     useEffect(()  => {
         const getFilesList = async ()=>{
-            const urlPath = location.pathname.replace("/files", "");
+            const urlPath = location.pathname.replace("/storage", "");
             console.log("Pathname: " + urlPath);
 
             const result:{path?: filePath[], items?: fileItem[], error?:string} = await listFiles(urlPath);
@@ -93,11 +94,11 @@ function Files({onReady, handleUpload}:props) {
         console.log("clicked path: " + id);
 
         if (id == "0"){
-            navigate("/files");
+            navigate("/storage");
         }
         if (location.pathname.includes(id)){
             console.log("ID: " + id);
-            navigate(`/files/${id}`);
+            navigate(`/storage/${id}`);
         }
     };
 
@@ -113,46 +114,60 @@ function Files({onReady, handleUpload}:props) {
       }
     };
 
-    const handleNewClick = (e:MouseEvent)=>{
-        console.log("New clicked");
-        // TODO: make the button work
-    };
-
-    const handleRightClickMenu = (e:React.MouseEvent)=>{
+    const handleContextMenu = (e:React.MouseEvent, type:string)=>{
         e.preventDefault();
+        e.stopPropagation()
 
-        setRightClickMenu({
+        setContextMenu({
             visible: true,
             x: e.clientX,
-            y: e.clientY
+            y: e.clientY,
+            type: type,
         });
     };
 
-    const handleRightClickMenuClose = () =>{
-        setRightClickMenu({
+    const handleContextMenuClose = () =>{
+        setContextMenu({
             visible: false,
             x: 0,
-            y: 0
+            y: 0,
+            type: ""
         });
     }
 
+
+    const handleNewClick = (e:MouseEvent)=>{
+        console.log("New clicked");
+        e.stopPropagation();
+        !contextMenu.visible ?
+            setContextMenu({
+            visible: true,
+            x: 58,
+            y: 145,
+            type: "general"
+        }):
+        handleContextMenuClose()
+
+    };
+
     // Make context menu close when interaction happening outside
     useEffect(() => {
-        const outOfRightClickMenu = (e:MouseEvent)=> {
-            if(rightClickMenuRef.current && !rightClickMenuRef.current.contains(e.target as Node)){
-                handleRightClickMenuClose();
+        const outOfContextMenu = (e:MouseEvent)=> {
+            const target = e.target as HTMLButtonElement;
+            if(!target.closest(".new-button") &&  contextMenuRef.current && !contextMenuRef.current.contains(e.target as Node)){
+                handleContextMenuClose();
             }
         }
-        document.addEventListener("mousedown", outOfRightClickMenu);
+        document.addEventListener("mousedown", outOfContextMenu);
         return () => {
-            document.removeEventListener("mousedown", outOfRightClickMenu);
+            document.removeEventListener("mousedown", outOfContextMenu);
         }
     }, []);
 
     return (
-        <div className="files-container h-full overflow-auto pl-5 pb-5 pr-5 m-5 border border-app-border rounded-lg bg-app-card" onContextMenu={(e) =>{handleRightClickMenu(e)}}>
+        <div className="files-container h-full overflow-auto pl-5 pb-5 pr-5 m-5 border border-app-border rounded-lg bg-app-card">
             {
-                rightClickMenu.visible && <ContextMenu ref={rightClickMenuRef} eventState={()=> handleRightClickMenuClose()} fileObject={handleUpload} posX={rightClickMenu.x} posY={rightClickMenu.y}/>
+                contextMenu.visible && <ContextMenu ref={contextMenuRef} eventState={()=> handleContextMenuClose()} fileObject={handleUpload} posX={contextMenu.x} posY={contextMenu.y} type={contextMenu.type}/>
             }
             <div className="storage-path-container flex w-full h-15 sticky top-0 bg-app-card">
                 <button onClick={e => handleNewClick(e)} className="new-button flex ml-5 text-xl items-center justify-center cursor-pointer text-white rounded-lg m-2 w-20 h-11 bg-cyan-500 hover:bg-cyan-400">
@@ -175,7 +190,7 @@ function Files({onReady, handleUpload}:props) {
             {
                 (errorMsg.length !== 0) ? (<div className="errorMsg text-2xl ml-5 mt-5">{errorMsg}</div>) :
 
-                <table className="files-table table-auto border-collapse border-spacing-x-8">
+                <table onContextMenu={(e) =>{handleContextMenu(e, "general")}} className="files-table table-auto border-collapse border-spacing-x-8">
                     <colgroup>
                         <col className="w-auto"/>
                         <col className="w-full"/>
@@ -199,7 +214,7 @@ function Files({onReady, handleUpload}:props) {
                     <tbody>
                     {
                         items.map((item) => (
-                            <tr onClick={(e) => handleItemClick(e, item.id, item.type)} key={`${item.type}-${item.id}`} id={item.id} className="hover:bg-app-hover cursor-pointer">
+                            <tr onContextMenu={(e)=> handleContextMenu(e, "entry")} onClick={(e) => handleItemClick(e, item.id, item.type)} key={`${item.type}-${item.id}`} id={item.id} className="hover:bg-app-hover cursor-pointer">
                                 <td className="py-4 border-b border-app-border pl-4">
                                     {
                                         item.type === "file" ? <FileIcon className="w-7 h-7"/> : <FolderIcon className="w-7 h-7"/>

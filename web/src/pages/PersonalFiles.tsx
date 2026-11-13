@@ -99,7 +99,7 @@ function PersonalFiles({onLogout, encryptionKey}:props){
         profile();
     }, []);
 
-    // make dropdown close when interaction happening outside
+    // Make dropdown close when interaction happening outside
     useEffect(() => {
         const outOfProfileDropDown = (e:MouseEvent)=> {
             if(profileDropDownRef.current && !profileDropDownRef.current.contains(e.target as Node)){

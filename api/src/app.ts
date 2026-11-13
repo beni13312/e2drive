@@ -26,7 +26,7 @@ app.use("/api", validateSession);
 
 // authenticated endpoints
 app.use("/api/validate", validate);
-app.use("/api/files", files);
+app.use("/api/storage", files);
 app.use("/api/profile", profile);
 
 // catch all invalid paths

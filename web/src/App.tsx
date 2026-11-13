@@ -8,6 +8,19 @@ import {validateSession} from "./api/validate.ts";
 
 
 function App() {
+    // Prevents opening the default context menu across the app
+    useEffect(() => {
+        const preventDefaultContextMenu = (e: MouseEvent) => {
+            e.preventDefault();
+        };
+
+        document.addEventListener("contextmenu", preventDefaultContextMenu);
+
+        return () => {
+            document.removeEventListener("contextmenu", preventDefaultContextMenu);
+        };
+    }, []);
+
     return (
     <div className="app">
         <BrowserRouter>
@@ -40,9 +53,9 @@ function AppRoutes(){
                 isCheckingSession ? (
                         <div></div>
                 ) :
-                (isSessionValid) ? <Navigate to="/files" replace /> : <Login onLogin={() => setIsSessionValid(true)} setEncryptionPassword={setEncryptionKey} />
+                (isSessionValid) ? <Navigate to="/storage" replace /> : <Login onLogin={() => setIsSessionValid(true)} setEncryptionPassword={setEncryptionKey} />
             } />
-            <Route path="/files/*" element={
+            <Route path="/storage/*" element={
                 isCheckingSession ? (
                     <div></div>
                 ) :
