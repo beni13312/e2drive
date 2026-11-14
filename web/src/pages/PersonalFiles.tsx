@@ -7,6 +7,9 @@ import Loading from "../components/Loading.tsx";
 import E2ee from "../core/crypto/e2ee.ts";
 import {getProfileName} from "../api/profile.ts";
 import Logo from "../assets/logo/logo.svg?react";
+import SettingsIcon from "../assets/icons/settings.svg?react";
+import InformationIcon from "../assets/icons/info.svg?react"
+import LogOutIcon from "../assets/icons/logout.svg?react";
 
 interface props{
     onLogout: () => void,
@@ -136,9 +139,9 @@ function PersonalFiles({onLogout, encryptionKey}:props){
                                     isProfileDropDown && (
                                         <div className="profile-drop-down w-60 z-1 rounded-lg top-16 right-0 absolute bg-app-card shadow-[4px_4px_8px_rgba(0,0,0,0.15)]">
                                             <ul>
-                                                <li className="pl-5 p-2 hover:bg-app-hover hover:rounded-lg cursor-pointer">Settings</li>
-                                                <li className="pl-5 p-2 hover:bg-app-hover hover:rounded-lg cursor-pointer">Information</li>
-                                                <li onClick={handleLogOut} className="pl-5 p-2 hover:bg-app-hover hover:rounded-lg cursor-pointer">Log out</li>
+                                                <li className="p-2 hover:bg-app-hover hover:rounded-lg flex cursor-pointer"><SettingsIcon className="fill-white mr-2"/> Settings</li>
+                                                <li className="p-2 hover:bg-app-hover hover:rounded-lg flex cursor-pointer"><InformationIcon className="fill-white mr-2"/> Information</li>
+                                                <li onClick={handleLogOut} className="p-2 hover:bg-app-hover hover:rounded-lg flex cursor-pointer"><LogOutIcon className="fill-white mr-2"/> Log out</li>
                                             </ul>
                                         </div>
                                     )

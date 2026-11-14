@@ -1,5 +1,11 @@
 import React, {useLayoutEffect, useRef} from "react";
 import {UploadFile, UploadFolder} from "./Upload.tsx";
+import NewFolderIcon from "../assets/icons/new_folder.svg?react";
+import FileUploadIcon from "../assets/icons/file_upload.svg?react";
+import FolderUploadIcon from "../assets/icons/folder_upload.svg?react";
+import DownloadIcon from "../assets/icons/download.svg?react";
+import ViewIcon from "../assets/icons/view.svg?react";
+import EditIcon from "../assets/icons/edit.svg?react";
 
 interface props {
     ref: React.RefObject<HTMLDivElement | null>,
@@ -41,18 +47,18 @@ function ContextMenu({ref, eventState, fileObject, posX, posY, type}:props){
                   <UploadFile ref={uploadFileRef} eventState={()=> eventState()} fileObject={fileObject}/>
                   <UploadFolder ref={uploadFolderRef} eventState={()=> eventState()} fileObject={fileObject}/>
                   <ul>
-                      <li className="pl-5 p-2 hover:bg-app-hover hover:rounded-lg cursor-pointer">New folder</li>
-                      <li onClick={handleFileUpload} className="pl-5 p-2 hover:bg-app-hover hover:rounded-lg cursor-pointer">File upload</li>
-                      <li onClick={handleFolderUpload} className="pl-5 p-2 hover:bg-app-hover hover:rounded-lg cursor-pointer">Folder upload</li>
+                      <li className="p-2 hover:bg-app-hover hover:rounded-lg flex cursor-pointer"><NewFolderIcon className="fill-white mr-2"/> New folder</li>
+                      <li onClick={handleFileUpload} className="p-2 hover:bg-app-hover hover:rounded-lg flex cursor-pointer"><FileUploadIcon className="fill-white mr-2"/> File upload</li>
+                      <li onClick={handleFolderUpload} className="p-2 hover:bg-app-hover hover:rounded-lg flex cursor-pointer"><FolderUploadIcon className="fill-white mr-2"/> Folder upload</li>
                   </ul>
 
           </>
           ): (
               <>
                   <ul>
-                      <li className="pl-5 p-2 hover:bg-app-hover hover:rounded-lg cursor-pointer">View</li>
-                      <li className="pl-5 p-2 hover:bg-app-hover hover:rounded-lg cursor-pointer">Rename</li>
-                      <li className="pl-5 p-2 hover:bg-app-hover hover:rounded-lg cursor-pointer">Download</li>
+                      <li className="p-2 hover:bg-app-hover hover:rounded-lg flex cursor-pointer"><ViewIcon className="fill-white mr-2"/> View</li>
+                      <li className="p-2 hover:bg-app-hover hover:rounded-lg flex cursor-pointer"><EditIcon className="fill-white mr-2"/> Rename</li>
+                      <li className="p-2 hover:bg-app-hover hover:rounded-lg flex cursor-pointer"><DownloadIcon className="fill-white mr-2"/> Download</li>
                   </ul>
               </>
           )}
