@@ -1,4 +1,4 @@
-import React, {useLayoutEffect, useRef} from "react";
+import React, {useLayoutEffect, useRef, useState} from "react";
 import {UploadFile, UploadFolder} from "./Upload.tsx";
 import NewFolderIcon from "../assets/icons/new_folder.svg?react";
 import FileUploadIcon from "../assets/icons/file_upload.svg?react";
@@ -28,18 +28,44 @@ function ContextMenu({ref, eventState, fileObject, posX, posY, type}:props){
         uploadFolderRef.current?.click();
     }
 
+    const [coordinates, setCoordinates] = useState(
+        {
+            x: posX,
+            y: posY
+        }
+    );
     useLayoutEffect(()=>{
-        if(ref.current) return;
+        if(!ref.current) return;
+
+        const rect = ref.current.getBoundingClientRect();
+
+        const menuWidth = rect.width;
+        const menuHeight = rect.height;
+
+        let x = posX;
+        let y = posY;
+
+        // flip at x coordinates
+        if (posX + menuWidth > window.innerWidth) {
+            x -= menuWidth;
+        }
+
+        // flip at y coordinates
+        if (posY + menuHeight > window.innerHeight){
+            y -= menuHeight;
+        }
+
+        setCoordinates({x,y});
 
 
-    },[ref, posX, posY])
+    },[posX, posY]);
 
     return (
       <div ref={ref} className="context-menu rounded-lg absolute bg-app-card shadow-[4px_4px_8px_rgba(0,0,0,0.15)] w-50 z-10"
       style={
           {
-              left: posX,
-              top: posY,
+              left: coordinates.x,
+              top: coordinates.y,
           }
       }>
           {type === "general" ? (

@@ -137,7 +137,6 @@ function Files({onReady, handleUpload}:props) {
 
 
     const handleNewClick = (e:MouseEvent)=>{
-        console.log("New clicked");
         e.stopPropagation();
         !contextMenu.visible ?
             setContextMenu({

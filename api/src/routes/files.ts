@@ -177,8 +177,9 @@ router.post("/uploadMetadata", async (req, res) => {
 
         const body = req.body;
 
-        const filenameBytes = body.filename
-        const size = body.size;
+        const filenameBase64Decoded:string = atob(String(body.filename));
+        const filenameBytes:Uint8Array = Uint8Array.from(filenameBase64Decoded, (char)=> char.charCodeAt(0));
+        const size: number = body.size;
         const modDate = new Date (Number(body.modDate));
 
         console.log("File size: " + size);

@@ -10,6 +10,7 @@ import Logo from "../assets/logo/logo.svg?react";
 import SettingsIcon from "../assets/icons/settings.svg?react";
 import InformationIcon from "../assets/icons/info.svg?react"
 import LogOutIcon from "../assets/icons/logout.svg?react";
+import SearchIcon from "../assets/icons/search.svg?react";
 
 interface props{
     onLogout: () => void,
@@ -129,7 +130,10 @@ function PersonalFiles({onLogout, encryptionKey}:props){
                                 <Logo className="size-15"/>
                             </li>
                             <li className="searchbar flex ml-auto items-center">
-                                <input className="border-2 border-app-border focus:outline-none px-4 rounded-lg h-10 w-100" placeholder="Search"/>
+                                <div className="gap-2 flex flex-row border-2 items-center rounded-lg border-app-border w-90 h-10">
+                                    <SearchIcon className="fill-white size-7 ml-2"/>
+                                    <input className="h-full w-full flex focus:outline-none" placeholder="Search"/>
+                                </div>
                             </li>
                             <li ref={profileDropDownRef} className="profile flex ml-auto items-center relative">
                                 <div onClick={(e)=> handleProfileDropDown(e)} className="profile-name hover:bg-app-hover rounded-lg p-2 cursor-pointer">
@@ -137,7 +141,7 @@ function PersonalFiles({onLogout, encryptionKey}:props){
                                 </div>
                                 {
                                     isProfileDropDown && (
-                                        <div className="profile-drop-down w-60 z-1 rounded-lg top-16 right-0 absolute bg-app-card shadow-[4px_4px_8px_rgba(0,0,0,0.15)]">
+                                        <div className="profile-drop-down w-50 z-1 rounded-lg top-16 right-0 absolute bg-app-card shadow-[4px_4px_8px_rgba(0,0,0,0.15)]">
                                             <ul>
                                                 <li className="p-2 hover:bg-app-hover hover:rounded-lg flex cursor-pointer"><SettingsIcon className="fill-white mr-2"/> Settings</li>
                                                 <li className="p-2 hover:bg-app-hover hover:rounded-lg flex cursor-pointer"><InformationIcon className="fill-white mr-2"/> Information</li>
