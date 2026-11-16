@@ -71,7 +71,7 @@ router.get("/list", async (req, res) => {
         const tokenHash = crypto.hash("sha256", sessionCookie);
 
         const requestedPath = String(req.query.path);
-        console.log("Requested URL: " + requestedPath);
+        console.log("Requested Path: " + requestedPath);
 
         if(!requestedPath){
             return res.status(400).json({error: "Failed to get requested path"});
@@ -169,36 +169,50 @@ router.get("/list", async (req, res) => {
 
 router.post("/uploadMetadata", async (req, res) => {
     try{
-        console.log("FilePath: " + req.query.path);
+        const sessionCookie = req.cookies["session"];
+
+        const tokenHash = crypto.hash("sha256", sessionCookie);
+
+        const requestedPath = String(req.query.path);
+        console.log("Requested Path: " + requestedPath);
+
+        if(!requestedPath){
+            return res.status(400).json({error: "Failed to get requested path"});
+        }
 
         if(!req.body){
             return res.status(400).json({error: "Failed to read request"});
         }
 
+        const parentId:number | null = Number(requestedPath.split('/').filter(Boolean).at(-1)) || null;
+        console.log("parentId", parentId);
+
         const body = req.body;
 
-        const filenameBase64Decoded:string = atob(String(body.filename));
-        const filenameBytes:Uint8Array = Uint8Array.from(filenameBase64Decoded, (char)=> char.charCodeAt(0));
-        const size: number = body.size;
+        const filenameBytes:Buffer = Buffer.from(body.filename, "base64");
+        const size: number = body.dataSize;
         const modDate = new Date (Number(body.modDate));
 
         console.log("File size: " + size);
         console.log("File modDate: " + modDate);
 
-        const sessionCookie = req.cookies["session"];
-
-        const tokenHash = crypto.hash("sha256", sessionCookie);
-        const result = db()`INSERT INTO files (owner_id, parent_id, encrypted_name, size, modified_at)
+        console.log("tokenHash: " + tokenHash);
+        const result = await db()`INSERT INTO files (owner_id, parent_id, encrypted_name, size, modified_at)
                         VALUES (
                         (SELECT users.id FROM users
                         JOIN sessions ON sessions.user_id = users.id WHERE sessions.token=${tokenHash}),
-                                NULL,
+                                ${parentId},
                                 ${filenameBytes},
                                 ${size},
                                 ${modDate}
-                               )`;
+                               ) RETURNING id`;
 
-        return res.status(200).json({});
+        console.log(result);
+        if (result.length === 0){
+            return res.status(500).json({error: "Failed to insert data to database"});
+        }
+
+        return res.status(200).json(result[0]);
     }catch (error){
         return res.status(500).json({error: "Failed to upload files"});
     }

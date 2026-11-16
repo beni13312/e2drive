@@ -35,8 +35,8 @@ export async function listFiles(path:string | null) {
 
 export async function uploadMetaData(
     path:string | null,
-    filename:string,
-    size: string,
+    encryptedFilenameBase64:string,
+    size: number,
     modDate:string
 )
 {
@@ -44,7 +44,7 @@ export async function uploadMetaData(
 
     return await api.post(`/api/storage/uploadMetaData?path=${encodeURIComponent(path)}`,
         {
-            filename: new TextEncoder().encode(filename),
+            filename: encryptedFilenameBase64,
             dataSize: size,
             modDate: modDate
         }

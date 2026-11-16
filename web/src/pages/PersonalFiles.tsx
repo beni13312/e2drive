@@ -54,16 +54,18 @@ function PersonalFiles({onLogout, encryptionKey}:props){
         if (upload?.[0].webkitRelativePath){
             console.log("folder");
         }
+
+        const urlPath = location.pathname.replace("/storage", "");
         for (const f of upload){
             console.log("Upload: " + f.name + "file size: " + Math.floor(f.size / 1024) + "KB");
 
             const encryptedFileName = await e2ee.encrypt(Uint8Array.from(f.name));
-            const base64EncryptedFileName = btoa(String.fromCodePoint(...encryptedFileName));
-            console.log("Base64FileName: " + base64EncryptedFileName);
+            const encryptedFileNameBase64 = btoa(String.fromCodePoint(...encryptedFileName));
+            console.log("Base64FileName: " + encryptedFileNameBase64);
 
-            const uploadFileInfo = await uploadMetaData(null, base64EncryptedFileName, String(f.size), String(f.lastModified));
+            const uploadFileInfo = await uploadMetaData(String(urlPath), encryptedFileNameBase64, f.size, String(f.lastModified));
             if (uploadFileInfo.id){
-                // Get ids from response to be able to upload the data
+                console.log("file ID in database: " + uploadFileInfo.id);
             }
 
             let bufferSize = 64 * 1024 // 64KB

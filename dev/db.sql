@@ -4,6 +4,8 @@ select 1 from sessions where token='3dc11845f1e348d5d232427eecf726e84268523d0251
 
 SELECT users.password FROM users JOIN sessions ON sessions.user_id = users.id WHERE sessions.token='859b066d0aff65274c30d0bc021f07424116c75dd37460c2f23c5d5b10999ffb';
 
+select users.id from users join sessions on sessions.user_id = users.id where sessions.token = 'bd7196ab7e8fa8b0f7c13504ae54c793ba31d79958d32a4fd797fb93aece3844';
+
 truncate table sessions restart identity;
 
 -- list from root folder
