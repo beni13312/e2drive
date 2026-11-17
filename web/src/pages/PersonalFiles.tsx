@@ -23,6 +23,7 @@ function PersonalFiles({onLogout, encryptionKey}:props){
     const [isLoaded, setIsLoaded] = useState(false);
     const [profileName, setProfileName] = useState("");
     const [isProfileDropDown, setProfileDropDown] = useState(false);
+    const [isUploaded, setIsUploaded] = useState(false);
 
     const profileDropDownRef = useRef<HTMLLIElement>(null);
 
@@ -94,6 +95,7 @@ function PersonalFiles({onLogout, encryptionKey}:props){
             });
 
             const result = await uploadChunk(dataStream);
+            setIsUploaded(true);
         }
 
     };
@@ -156,7 +158,7 @@ function PersonalFiles({onLogout, encryptionKey}:props){
                         </ul>
                     </header>
                     <main className="main w-full min-h-0 flex-1 mb-10">
-                           <Files onReady={()=> setIsLoaded(true)} handleUpload={handleUpload} />
+                           <Files onReady={()=> setIsLoaded(true)} handleUpload={handleUpload} isUploaded={isUploaded}/>
                     </main>
 
             </div>

@@ -5,10 +5,12 @@ import AddIcon from "../assets/icons/add.svg?react";
 import FileIcon from "../assets/icons/draft.svg?react";
 import FolderIcon from "../assets/icons/folder.svg?react";
 import ContextMenu from "./ContextMenu.tsx";
+import CreateFolder from "./CreateFolder.tsx";
 
 interface props {
     onReady: () => void;
     handleUpload: (upload: FileList | null) => void;
+    isUploaded: boolean;
 }
 
 interface fileItem{
@@ -28,7 +30,7 @@ function parseUrl(arrayPath: Array<string>):string{
     return arrayPath.join('/');
 }
 
-function Files({onReady, handleUpload}:props) {
+function Files({onReady, handleUpload, isUploaded}:props) {
     const location = useLocation();
     const navigate = useNavigate();
 
@@ -44,6 +46,7 @@ function Files({onReady, handleUpload}:props) {
     });
     const [items, setItems] = useState<fileItem[]>([]);
     const [errorMsg, setErrorMsg] = useState<string>("");
+    const [isNewFolder, setIsNewFolder] = useState(false);
 
     const contextMenuRef = useRef<HTMLDivElement>(null);
 
@@ -79,7 +82,7 @@ function Files({onReady, handleUpload}:props) {
         getFilesList();
         
          if (onReady) onReady();
-    }, [location.pathname]);
+    }, [location.pathname, isUploaded]);
 
 
     // update page title
@@ -164,9 +167,17 @@ function Files({onReady, handleUpload}:props) {
     }, []);
 
     return (
-        <div className="files-container h-full overflow-auto pl-5 pb-5 pr-5 m-5 border border-app-border rounded-lg bg-app-card">
+        <div className="files-container h-full overflow-auto flex flex-col pl-5 pb-5 pr-5 m-5 border border-app-border rounded-lg bg-app-card">
             {
-                contextMenu.visible && <ContextMenu ref={contextMenuRef} eventState={()=> handleContextMenuClose()} fileObject={handleUpload} posX={contextMenu.x} posY={contextMenu.y} type={contextMenu.type}/>
+                contextMenu.visible && <ContextMenu
+                    ref={contextMenuRef}
+                    eventState={()=> handleContextMenuClose()}
+                    handleUpload={handleUpload}
+                    onNewFolder={() => setIsNewFolder(true)}
+                    posX={contextMenu.x} posY={contextMenu.y} type={contextMenu.type}/>
+            }
+            {
+                isNewFolder && <CreateFolder onCancel={()=> setIsNewFolder(false)} onCreate={(folderName) => console.log("New folder name: " + folderName)} />
             }
             <div className="storage-path-container flex w-full h-15 sticky top-0 bg-app-card">
                 <button onClick={e => handleNewClick(e)} className="new-button flex ml-5 text-xl items-center justify-center cursor-pointer text-white rounded-lg m-2 w-20 h-11 bg-cyan-500 hover:bg-cyan-400">
@@ -187,48 +198,52 @@ function Files({onReady, handleUpload}:props) {
                 </div>
             </div>
             {
-                (errorMsg.length !== 0) ? (<div className="errorMsg text-2xl ml-5 mt-5">{errorMsg}</div>) :
+                (errorMsg.length !== 0) ? (<div className="errorMsg text-2xl ml-5 mt-5">{errorMsg}</div>) : (
 
-                <table onContextMenu={(e) =>{handleContextMenu(e, "general")}} className="files-table table-auto border-collapse border-spacing-x-8">
-                    <colgroup>
-                        <col className="w-auto"/>
-                        <col className="w-full"/>
-                        <col className="w-auto"/>
-                        <col className="w-auto"/>
-                    </colgroup>
-                    <thead>
-                    <tr>
-                        <th className="text-left sticky top-15 shadow-[inset_0_-1px_0_0_var(--color-app-border)] bg-app-card py-4"></th>
-                        <th className="text-left sticky top-15 shadow-[inset_0_-1px_0_0_var(--color-app-border)] bg-app-card py-4">
-                            <div className="hover:bg-app-hover rounded-lg cursor-pointer py-1 px-4">Name</div>
-                        </th>
-                        <th className="text-left sticky top-15 shadow-[inset_0_-1px_0_0_var(--color-app-border)] bg-app-card py-4">
-                            <div className="hover:bg-app-hover rounded-lg cursor-pointer py-1 px-4">Size</div>
-                        </th>
-                        <th className="text-left sticky top-15 shadow-[inset_0_-1px_0_0_var(--color-app-border)] bg-app-card py-4">
-                            <div className="hover:bg-app-hover rounded-lg cursor-pointer py-1 px-4">Date</div>
-                        </th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    {
-                        items.map((item) => (
-                            <tr onContextMenu={(e)=> handleContextMenu(e, "entry")} onClick={(e) => handleItemClick(e, item.id, item.type)} key={`${item.type}-${item.id}`} id={item.id} className="hover:bg-app-hover cursor-pointer">
-                                <td className="py-4 border-b border-app-border pl-4">
-                                    {
-                                        item.type === "file" ? <FileIcon className="w-7 h-7"/> : <FolderIcon className="w-7 h-7"/>
-                                    }
-                                </td>
-                                <td className="py-1 border-b border-app-border px-4">{item.encryptedName}</td>
-                                <td className="py-1 border-b border-app-border px-4">{item.size}B</td>
-                                <td className="py-1 border-b border-app-border px-4">{String(item.modDate).slice(0, 10).replaceAll('-', '.')}</td>
-                            </tr>
-                        ))
-                    }
+                <div onContextMenu={(e) => handleContextMenu(e, "general")} className="files-table-container flex-1">
+
+                    <table className="files-table table-auto border-collapse border-spacing-x-8">
+                        <colgroup>
+                            <col className="w-auto"/>
+                            <col className="w-full"/>
+                            <col className="w-auto"/>
+                            <col className="w-auto"/>
+                        </colgroup>
+                        <thead>
+                        <tr>
+                            <th className="text-left sticky top-15 shadow-[inset_0_-1px_0_0_var(--color-app-border)] bg-app-card py-4"></th>
+                            <th className="text-left sticky top-15 shadow-[inset_0_-1px_0_0_var(--color-app-border)] bg-app-card py-4">
+                                <div className="hover:bg-app-hover rounded-lg cursor-pointer py-1 px-4">Name</div>
+                            </th>
+                            <th className="text-left sticky top-15 shadow-[inset_0_-1px_0_0_var(--color-app-border)] bg-app-card py-4">
+                                <div className="hover:bg-app-hover rounded-lg cursor-pointer py-1 px-4">Size</div>
+                            </th>
+                            <th className="text-left sticky top-15 shadow-[inset_0_-1px_0_0_var(--color-app-border)] bg-app-card py-4">
+                                <div className="hover:bg-app-hover rounded-lg cursor-pointer py-1 px-4">Date</div>
+                            </th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {
+                            items.map((item) => (
+                                <tr onContextMenu={(e)=> handleContextMenu(e, "entry")} onClick={(e) => handleItemClick(e, item.id, item.type)} key={`${item.type}-${item.id}`} id={item.id} className="hover:bg-app-hover cursor-pointer">
+                                    <td className="py-4 border-b border-app-border pl-4">
+                                        {
+                                            item.type === "file" ? <FileIcon className="w-7 h-7"/> : <FolderIcon className="w-7 h-7"/>
+                                        }
+                                    </td>
+                                    <td className="py-1 border-b border-app-border px-4">{item.encryptedName}</td>
+                                    <td className="py-1 border-b border-app-border px-4">{item.size}B</td>
+                                    <td className="py-1 border-b border-app-border px-4">{String(item.modDate).slice(0, 10).replaceAll('-', '.')}</td>
+                                </tr>
+                            ))
+                        }
 
 
-                    </tbody>
-                </table>
+                        </tbody>
+                    </table>
+                </div>
+                )
             }
         </div>
     );

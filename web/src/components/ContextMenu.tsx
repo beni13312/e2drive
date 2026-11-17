@@ -10,13 +10,14 @@ import EditIcon from "../assets/icons/edit.svg?react";
 interface props {
     ref: React.RefObject<HTMLDivElement | null>,
     eventState: () => void,
-    fileObject: (files:FileList | null) => void,
+    handleUpload: (files:FileList | null) => void,
+    onNewFolder: () => void,
     posX: number,
     posY: number,
     type: "general" | "entry" | string
 }
 
-function ContextMenu({ref, eventState, fileObject, posX, posY, type}:props){
+function ContextMenu({ref, eventState, handleUpload, onNewFolder, posX, posY, type}:props){
 
     const uploadFileRef = useRef<HTMLInputElement>(null);
     const uploadFolderRef = useRef<HTMLInputElement>(null);
@@ -70,10 +71,10 @@ function ContextMenu({ref, eventState, fileObject, posX, posY, type}:props){
       }>
           {type === "general" ? (
               <>
-                  <UploadFile ref={uploadFileRef} eventState={()=> eventState()} fileObject={fileObject}/>
-                  <UploadFolder ref={uploadFolderRef} eventState={()=> eventState()} fileObject={fileObject}/>
+                  <UploadFile ref={uploadFileRef} eventState={()=> eventState()} handleUpload={handleUpload}/>
+                  <UploadFolder ref={uploadFolderRef} eventState={()=> eventState()} handleUpload={handleUpload}/>
                   <ul>
-                      <li className="p-2 hover:bg-app-hover hover:rounded-lg flex cursor-pointer"><NewFolderIcon className="fill-white mr-2"/> New folder</li>
+                      <li onClick={onNewFolder} className="p-2 hover:bg-app-hover hover:rounded-lg flex cursor-pointer"><NewFolderIcon className="fill-white mr-2"/> New folder</li>
                       <li onClick={handleFileUpload} className="p-2 hover:bg-app-hover hover:rounded-lg flex cursor-pointer"><FileUploadIcon className="fill-white mr-2"/> File upload</li>
                       <li onClick={handleFolderUpload} className="p-2 hover:bg-app-hover hover:rounded-lg flex cursor-pointer"><FolderUploadIcon className="fill-white mr-2"/> Folder upload</li>
                   </ul>
