@@ -180,16 +180,16 @@ function Files({onReady, handleUpload, isUploaded}:props) {
                 isNewFolder && <CreateFolder onCancel={()=> setIsNewFolder(false)} onCreate={(folderName) => console.log("New folder name: " + folderName)} />
             }
             <div className="storage-path-container flex w-full h-15 sticky top-0 bg-app-card">
-                <button onClick={e => handleNewClick(e)} className="new-button flex ml-5 text-xl items-center justify-center cursor-pointer text-white rounded-lg m-2 w-20 h-11 bg-cyan-500 hover:bg-cyan-400">
-                     <AddIcon className="fill-white"/> New
+                <button onClick={e => handleNewClick(e)} className="new-button flex ml-5 items-center justify-center cursor-pointer text-on-accent rounded-lg m-2 w-20 h-11 bg-accent hover:bg-accent-hover">
+                     <AddIcon className="fill-on-accent"/> New
                 </button>
                 <div className="storage-path flex ml-5 text-2xl text-app-text items-center">
                     {
                         path.map((segment, index) => (
                             <>
-                                <div onClick={e => handlePathClick(e, segment.id)} className="m-1 p-1 cursor-pointer hover:bg-app-hover rounded-lg text-app-text" id={segment.id} key={segment.id}>{segment.encryptedName}</div>
+                                <div onClick={e => handlePathClick(e, segment.id)} className={`m-1 p-1 cursor-pointer hover:bg-app-hover rounded-lg ${index < path.length - 1 ? "text-app-unfocused" : "text-app-text"}`} id={segment.id} key={segment.id}>{segment.encryptedName}</div>
                                 {index < path.length - 1 && (
-                                    <div>/</div>
+                                    <div className="text-app-unfocused">/</div>
                                 )}
 
                             </>
@@ -229,7 +229,7 @@ function Files({onReady, handleUpload, isUploaded}:props) {
                                 <tr onContextMenu={(e)=> handleContextMenu(e, "entry")} onClick={(e) => handleItemClick(e, item.id, item.type)} key={`${item.type}-${item.id}`} id={item.id} className="hover:bg-app-hover cursor-pointer">
                                     <td className="py-4 border-b border-app-border pl-4">
                                         {
-                                            item.type === "file" ? <FileIcon className="w-7 h-7"/> : <FolderIcon className="w-7 h-7"/>
+                                            item.type === "file" ? <FileIcon className="w-7 h-7 fill-file-icon"/> : <FolderIcon className="w-7 h-7 fill-folder-icon"/>
                                         }
                                     </td>
                                     <td className="py-1 border-b border-app-border px-4">{item.encryptedName}</td>

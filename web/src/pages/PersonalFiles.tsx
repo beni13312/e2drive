@@ -134,8 +134,8 @@ function PersonalFiles({onLogout, encryptionKey}:props){
                                 <Logo className="size-15"/>
                             </li>
                             <li className="searchbar flex ml-auto items-center">
-                                <div className="gap-2 flex flex-row border-2 items-center rounded-lg border-app-border w-90 h-10">
-                                    <SearchIcon className="fill-white size-7 ml-2"/>
+                                <div className="gap-2 flex flex-row border-2 items-center rounded-lg border-app-border focus-within:border-app-border-focus w-90 h-10">
+                                    <SearchIcon className="fill-app-text size-7 ml-2"/>
                                     <input className="h-full w-full flex focus:outline-none" placeholder="Search"/>
                                 </div>
                             </li>
@@ -145,11 +145,11 @@ function PersonalFiles({onLogout, encryptionKey}:props){
                                 </div>
                                 {
                                     isProfileDropDown && (
-                                        <div className="profile-drop-down w-50 z-1 rounded-lg top-16 right-0 absolute bg-app-card shadow-[4px_4px_8px_rgba(0,0,0,0.15)]">
+                                        <div className="profile-drop-down w-50 z-1 rounded-lg top-16 right-0 absolute bg-app-bg shadow-[4px_4px_8px_rgba(0,0,0,0.15)]">
                                             <ul>
-                                                <li className="p-2 hover:bg-app-hover hover:rounded-lg flex cursor-pointer"><SettingsIcon className="fill-white mr-2"/> Settings</li>
-                                                <li className="p-2 hover:bg-app-hover hover:rounded-lg flex cursor-pointer"><InformationIcon className="fill-white mr-2"/> Information</li>
-                                                <li onClick={handleLogOut} className="p-2 hover:bg-app-hover hover:rounded-lg flex cursor-pointer"><LogOutIcon className="fill-white mr-2"/> Log out</li>
+                                                <li className="p-2 hover:bg-app-hover hover:rounded-lg flex cursor-pointer"><SettingsIcon className="fill-app-text mr-2"/> Settings</li>
+                                                <li className="p-2 hover:bg-app-hover hover:rounded-lg flex cursor-pointer"><InformationIcon className="fill-app-text mr-2"/> Information</li>
+                                                <li onClick={handleLogOut} className="p-2 hover:bg-app-hover hover:rounded-lg flex cursor-pointer"><LogOutIcon className="fill-app-text mr-2"/> Log out</li>
                                             </ul>
                                         </div>
                                     )

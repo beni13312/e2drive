@@ -7,11 +7,17 @@
         --theme-color-app-card: #ffffff;
         --theme-color-app-text: #0f172a;
         --theme-color-app-border: #e2e8f0;
+        --theme-color-app-border-focus: #cbd5e1;
         --theme-color-app-hover: #e5e7eb;
+        --theme-color-app-unfocused: #64748b;
 
-        --theme-color-brand-blue: #1a73e8;
-        --theme-color-brand-blue-hover: #1557b0;
+        --theme-color-accent: oklch(60.9% 0.126 221.723);
+        --theme-color-on-accent: #e3e3e3;
+        --theme-color-accent-hover: oklch(52% 0.105 223.128);
         --theme-color-logo-text: #183454;
+
+        --theme-color-folder-icon: oklch(60.9% 0.126 221.723);
+        --theme-color-file-icon: oklch(55.4% 0.046 257.417);
 
     }
 
@@ -22,11 +28,17 @@
             --theme-color-app-card: #1f1f20;
             --theme-color-app-text: #e3e3e3;
             --theme-color-app-border: #444746;
+            --theme-color-app-border-focus: #5f6368;
             --theme-color-app-hover: #2a2b2d;
+            --theme-color-app-unfocused: #9ca3af;
 
-            --theme-color-brand-blue: #a8c7fa;
-            --theme-color-brand-blue-hover: #c2e7ff;
+            --theme-color-accent: oklch(71.5% 0.143 215.221);
+            --theme-color-on-accent: #0f172a;
+            --theme-color-accent-hover: oklch(78.9% 0.154 211.53);
             --theme-color-logo-text: #6095d1;
+
+            --theme-color-folder-icon: oklch(71.5% 0.143 215.221);
+            --theme-color-file-icon: oklch(70.4% 0.04 256.788);
         }
     }
 }
@@ -37,11 +49,17 @@
     --color-app-card: var(--theme-color-app-card);
     --color-app-text: var(--theme-color-app-text);
     --color-app-border: var(--theme-color-app-border);
+    --color-app-border-focus: var(--theme-color-app-border-focus);
     --color-app-hover: var(--theme-color-app-hover);
+    --color-app-unfocused: var(--theme-color-app-unfocused);
 
-    --color-brand-blue: var(--theme-color-brand-blue);
-    --color-brand-blue-hover: var(--theme-color-brand-blue-hover);
+    --color-accent: var(--theme-color-accent);
+    --color-on-accent: var(--theme-color-on-accent);
+    --color-accent-hover: var(--theme-color-accent-hover);
     --color-logo-text: var(--theme-color-logo-text);
+
+    --color-folder-icon: var(--theme-color-folder-icon);
+    --color-file-icon: var(--theme-color-file-icon);
 }
 
 body {
