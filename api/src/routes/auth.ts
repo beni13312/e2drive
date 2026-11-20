@@ -14,8 +14,8 @@ router.post("/login", async (req, res) => {
         if (!email || !password){
             return res.status(400).json({error: "Empty email or password"});
         }
-        const result =  await db()`SELECT password FROM users WHERE email=${email}`;
-        const storedHash = result[0]?.password;
+        const result =  await db()`SELECT password_hash FROM users WHERE email=${email}`;
+        const storedHash = result[0]?.password_hash;
 
         if(!storedHash){
             return res.status(401).json({error: "Invalid Credentials: failed to retrieve data from database"});

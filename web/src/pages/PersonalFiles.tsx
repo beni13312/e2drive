@@ -2,7 +2,7 @@ import Files from "../components/Files.tsx";
 import {useNavigate} from "react-router-dom";
 import React, {useEffect, useState, useRef} from "react";
 import {logout} from "../api/auth.ts";
-import {uploadMetaData, uploadChunk} from "../api/files.ts";
+import {uploadMetaData, uploadChunk, createFolder} from "../api/storage.ts";
 import Loading from "../components/Loading.tsx";
 import E2ee from "../core/crypto/e2ee.ts";
 import {getProfileName} from "../api/profile.ts";
@@ -100,6 +100,15 @@ function PersonalFiles({onLogout, encryptionKey}:props){
 
     };
 
+    const handleCreateFolder = async (parentId:string, folderName:string)=>{
+        const e2ee = await E2ee.new(encryptionKey);
+
+        const encryptedFolderName = await e2ee.encrypt(Uint8Array.from(folderName));
+        const encryptedFolderNameeBase64 = btoa(String.fromCodePoint(...encryptedFolderName));
+        console.log("Base64FileName: " + encryptedFolderNameeBase64);
+        const result = createFolder(parentId,encryptedFolderNameeBase64);
+    }
+
     useEffect(() => {
         const profile = async ()=>{
             await handleProfileName();
@@ -158,7 +167,12 @@ function PersonalFiles({onLogout, encryptionKey}:props){
                         </ul>
                     </header>
                     <main className="main w-full min-h-0 flex-1 mb-10">
-                           <Files onReady={()=> setIsLoaded(true)} handleUpload={handleUpload} isUploaded={isUploaded}/>
+                           <Files
+                               onReady={()=> setIsLoaded(true)}
+                               handleUpload={handleUpload}
+                               isUploaded={isUploaded}
+                               handleCreateFolder={handleCreateFolder}
+                           />
                     </main>
 
             </div>

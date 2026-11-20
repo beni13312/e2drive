@@ -2,7 +2,7 @@
 select 1 from sessions where token='3dc11845f1e348d5d232427eecf726e84268523d02517408a415a52583bb4f37' and expires_at > '2026-10-01T16:51:39.089Z'::timestamptz;
 
 
-SELECT users.password FROM users JOIN sessions ON sessions.user_id = users.id WHERE sessions.token='859b066d0aff65274c30d0bc021f07424116c75dd37460c2f23c5d5b10999ffb';
+SELECT users.password_hash FROM users JOIN sessions ON sessions.user_id = users.id WHERE sessions.token='859b066d0aff65274c30d0bc021f07424116c75dd37460c2f23c5d5b10999ffb';
 
 select users.id from users join sessions on sessions.user_id = users.id where sessions.token = 'bd7196ab7e8fa8b0f7c13504ae54c793ba31d79958d32a4fd797fb93aece3844';
 

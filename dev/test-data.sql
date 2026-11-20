@@ -3,7 +3,7 @@
 -- db: app
 -- db user: dev
 
-insert into users (email, password, name) VALUES ('test@test.com', '$argon2id$v=19$m=65536,t=3,p=4$yyp+UxPKr1WsmIzhGQ4JmQ$vf4QxZy0ntOvxxnrXMG9/ILlg4VakpOZDshaBv1UZSg', 'Test John');
+insert into users (email, password_hash, name) VALUES ('test@test.com', '$argon2id$v=19$m=65536,t=3,p=4$yyp+UxPKr1WsmIzhGQ4JmQ$vf4QxZy0ntOvxxnrXMG9/ILlg4VakpOZDshaBv1UZSg', 'Test John');
 
 
 -- insert into root folder

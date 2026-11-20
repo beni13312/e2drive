@@ -1,6 +1,6 @@
 import React, {useEffect, useRef, useState} from "react";
 import {useNavigate, useLocation} from "react-router-dom";
-import {listFiles} from "../api/files.ts";
+import {listFiles} from "../api/storage.ts";
 import AddIcon from "../assets/icons/add.svg?react";
 import FileIcon from "../assets/icons/draft.svg?react";
 import FolderIcon from "../assets/icons/folder.svg?react";
@@ -11,6 +11,7 @@ interface props {
     onReady: () => void;
     handleUpload: (upload: FileList | null) => void;
     isUploaded: boolean;
+    handleCreateFolder: (parentId: string, folderName: string) => void;
 }
 
 interface fileItem{
@@ -30,12 +31,12 @@ function parseUrl(arrayPath: Array<string>):string{
     return arrayPath.join('/');
 }
 
-function Files({onReady, handleUpload, isUploaded}:props) {
+function Files({onReady, handleUpload, isUploaded, handleCreateFolder}:props) {
     const location = useLocation();
     const navigate = useNavigate();
 
     const [path, setPath] = useState<filePath[]>([
-        {id:"0", encryptedName: "Storage"} // the root placeholder
+        {id:"storage-root", encryptedName: "Storage"} // the root placeholder
     ]);
 
     const [contextMenu, setContextMenu] = useState({
@@ -45,26 +46,28 @@ function Files({onReady, handleUpload, isUploaded}:props) {
         type: ""
     });
     const [items, setItems] = useState<fileItem[]>([]);
-    const [errorMsg, setErrorMsg] = useState<string>("");
+    const [msg, setMsg] = useState<string>("");
     const [isNewFolder, setIsNewFolder] = useState(false);
 
     const contextMenuRef = useRef<HTMLDivElement>(null);
 
     // Get file and folder metadata
     useEffect(()  => {
+        // reset the msg useState
+        setMsg("");
         const getFilesList = async ()=>{
-            const urlPath = location.pathname.replace("/storage", "");
+            let urlPath = location.pathname.replace("/storage", "");
             console.log("Pathname: " + urlPath);
 
-            const result:{path?: filePath[], items?: fileItem[], error?:string} = await listFiles(urlPath);
+            const result:{path?: filePath[], items?: fileItem[], info?:string, error?:string} = await listFiles(urlPath);
             if (result.items && result.path){
                 setPath([
-                    {id:"0", encryptedName: "Storage"},
+                    {id:"storage-root", encryptedName: "Storage"},
                     ...result.path
                 ]);
                 setItems(result.items);
 
-                const urlPath = parseUrl(result.path.map(segment => segment.id));
+                urlPath = parseUrl(result.path.map(segment => segment.id));
 
                 console.log("URL parsed path: " + urlPath);
 
@@ -72,8 +75,14 @@ function Files({onReady, handleUpload, isUploaded}:props) {
                 if (!location.pathname.includes(urlPath)){
                     navigate(urlPath);
                 }
+            }else if(result.info){
+                setPath([
+                    {id:"storage-root", encryptedName: "Storage"},
+                    ...(result.path ?? [])
+                ]);
+                setMsg(result.info);
             }else if(result.error){
-                setErrorMsg(result.error);
+                setMsg(result.error);
             }
             console.log(result.path);
             console.log(result.items);
@@ -96,7 +105,7 @@ function Files({onReady, handleUpload, isUploaded}:props) {
     const handlePathClick = (e, id:string) =>{
         console.log("clicked path: " + id);
 
-        if (id == "0"){
+        if (id == "storage-root"){
             navigate("/storage");
         }
         if (location.pathname.includes(id)){
@@ -177,7 +186,9 @@ function Files({onReady, handleUpload, isUploaded}:props) {
                     posX={contextMenu.x} posY={contextMenu.y} type={contextMenu.type}/>
             }
             {
-                isNewFolder && <CreateFolder onCancel={()=> setIsNewFolder(false)} onCreate={(folderName) => console.log("New folder name: " + folderName)} />
+                isNewFolder && <CreateFolder
+                    onCancel={()=> setIsNewFolder(false)}
+                    onCreate={(folderName) => handleCreateFolder(path[-1]?.id ?? "", folderName)} />
             }
             <div className="storage-path-container flex w-full h-15 sticky top-0 bg-app-card">
                 <button onClick={e => handleNewClick(e)} className="new-button flex ml-5 items-center justify-center cursor-pointer text-on-accent rounded-lg m-2 w-20 h-11 bg-accent hover:bg-accent-hover">
@@ -198,7 +209,7 @@ function Files({onReady, handleUpload, isUploaded}:props) {
                 </div>
             </div>
             {
-                (errorMsg.length !== 0) ? (<div className="errorMsg text-2xl ml-5 mt-5">{errorMsg}</div>) : (
+                (msg.length !== 0) ? (<div className="errorMsg text-2xl ml-5 mt-5">{msg}</div>) : (
 
                 <div onContextMenu={(e) => handleContextMenu(e, "general")} className="files-table-container flex-1">
 

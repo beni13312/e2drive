@@ -5,7 +5,7 @@ import * as argon2 from "argon2";
 
 const router = Router();
 
-// using a simpler check for now
+// Using a simpler check for now
 router.post("/checkEncryptionPassword", async (req, res) => {
     try {
         // check users credentials
@@ -17,9 +17,9 @@ router.post("/checkEncryptionPassword", async (req, res) => {
         }
 
         const tokenHash = crypto.hash("sha256", sessionCookie);
-        const result =  await db()`SELECT users.password FROM users 
+        const result =  await db()`SELECT users.password_hash FROM users 
                         JOIN sessions ON sessions.user_id = users.id WHERE sessions.token=${tokenHash}`;
-        const storedHash = result[0]?.password;
+        const storedHash = result[0]?.password_hash;
 
         if(!storedHash){
             return res.status(401).json({error: "Invalid Credentials: failed to retrieve data from database"});
@@ -77,8 +77,8 @@ router.get("/list", async (req, res) => {
             return res.status(400).json({error: "Failed to get requested path"});
         }
 
-        const parentId:number | null = Number(requestedPath.split('/').filter(Boolean).at(-1)) || null;
-        const urlFolderPathArray:number[] = requestedPath.split('/').map(e => Number(e));
+        const parentId:string = requestedPath.split('/').filter(Boolean).at(-1) ?? "";
+        const urlFolderPathArray:string[] = requestedPath.split('/').map(e => e.trim()).filter(Boolean);
         console.log("parentId", parentId);
         console.log("urlFolderPathArray: " + urlFolderPathArray);
 
@@ -106,18 +106,18 @@ router.get("/list", async (req, res) => {
                             -- get folder path
                             folderPath AS (
                                 SELECT id, encode(encrypted_name, 'base64') as encrypted_name
-                                FROM folders WHERE  id=ANY(${urlFolderPathArray}::BIGINT[])
+                                FROM folders WHERE  id=ANY(${urlFolderPathArray}::UUID[])
                                 AND owner_id=(SELECT id FROM "current_user")
                             ),
                             
                             -- get files and folders
                             folderItems AS (
                                 SELECT id, 'file' AS type, encode(encrypted_name, 'base64') as encrypted_name, size, modified_at 
-                                FROM files WHERE parent_id IS NOT DISTINCT FROM ${parentId} 
+                                FROM files WHERE parent_id IS NOT DISTINCT FROM NULLIF(${parentId}, '')::UUID
                                 AND owner_id=(SELECT id FROM "current_user")
                                   UNION ALL
                                 SELECT id, 'folder' AS type, encode(encrypted_name, 'base64') as encrypted_name, size, modified_at 
-                                FROM folders WHERE parent_id IS NOT DISTINCT FROM ${parentId}
+                                FROM folders WHERE parent_id IS NOT DISTINCT FROM NULLIF(${parentId}, '')::UUID
                                 AND owner_id=(SELECT id FROM "current_user")
                                 )
                             
@@ -139,6 +139,9 @@ router.get("/list", async (req, res) => {
         };
 
         const dbResult = result[0];
+        if(dbResult.items.length == 0){
+            return res.status(200).json({info: "Empty directory"});
+        }
 
         for (const row of dbResult.path){
             response.path.push({
@@ -155,6 +158,7 @@ router.get("/list", async (req, res) => {
                 modDate: row.modified_at
             });
         }
+        console.log(response);
         if(response) {
             return res.status(200).json(response);
         }else {
@@ -184,7 +188,7 @@ router.post("/uploadMetadata", async (req, res) => {
             return res.status(400).json({error: "Failed to read request"});
         }
 
-        const parentId:number | null = Number(requestedPath.split('/').filter(Boolean).at(-1)) || null;
+        const parentId:string = requestedPath.split('/').filter(Boolean).at(-1) ?? "";
         console.log("parentId", parentId);
 
         const body = req.body;
@@ -201,7 +205,7 @@ router.post("/uploadMetadata", async (req, res) => {
                         VALUES (
                         (SELECT users.id FROM users
                         JOIN sessions ON sessions.user_id = users.id WHERE sessions.token=${tokenHash}),
-                                ${parentId},
+                                NULLIF(${parentId}, '')::UUID,
                                 ${filenameBytes},
                                 ${size},
                                 ${modDate}
@@ -234,6 +238,43 @@ router.post("/uploadChunk", async (req, res) => {
         return res.status(500).json({error: "Failed to upload files"});
     }
 });
+
+router.post("/createFolder", async (req,res)=>{
+    try{
+        const sessionCookie = req.cookies["session"];
+
+        const tokenHash = crypto.hash("sha256", sessionCookie);
+
+        if(!req.body){
+            return res.status(400).json({error: "Failed to read request"});
+        }
+
+        const body = req.body;
+
+        const parentId:string = body.parentId;
+        const folderNameBytes:Buffer = Buffer.from(body.folderName, "base64");
+        console.log("parentId", parentId);
+
+        console.log("tokenHash: " + tokenHash);
+        const result = await db()`INSERT INTO folders (owner_id, parent_id, encrypted_name)
+                        VALUES (
+                        (SELECT users.id FROM users
+                        JOIN sessions ON sessions.user_id = users.id WHERE sessions.token=${tokenHash}),
+                                NULLIF(${parentId}, '')::UUID,
+                                ${folderNameBytes}
+                               ) RETURNING id`;
+
+        if (result.length === 0){
+            return res.status(500).json({error: "Failed to insert data to database"});
+        }
+
+        return res.status(200).json({createFolder:true});
+    }catch (error){
+        return res.status(500).json({error: "Failed to create folder"});
+    }
+});
+
+
 
 router.get("/downlaod", async (req, res) => {
     try{

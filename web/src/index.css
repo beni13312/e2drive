@@ -16,7 +16,7 @@
         --theme-color-accent-hover: oklch(52% 0.105 223.128);
         --theme-color-logo-text: #183454;
 
-        --theme-color-folder-icon: oklch(60.9% 0.126 221.723);
+        --theme-color-folder-icon:  oklch(84% 0.175 95.746);
         --theme-color-file-icon: oklch(55.4% 0.046 257.417);
 
     }
@@ -37,7 +37,7 @@
             --theme-color-accent-hover: oklch(78.9% 0.154 211.53);
             --theme-color-logo-text: #6095d1;
 
-            --theme-color-folder-icon: oklch(71.5% 0.143 215.221);
+            --theme-color-folder-icon: oklch(92.4% 0.12 95.746);
             --theme-color-file-icon: oklch(70.4% 0.04 256.788);
         }
     }

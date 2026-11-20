@@ -1,6 +1,6 @@
 import express from 'express';
 import auth from './routes/auth.js';
-import files from './routes/files.js'
+import files from './routes/storage.js'
 import profile from './routes/profile.js';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';

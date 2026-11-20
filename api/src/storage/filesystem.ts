@@ -1,7 +1,7 @@
 import Config from "../config/config.js";
 import path from "node:path";
 
-export default class Storage {
+export default class Filesystem {
   public static read(){
 
   }

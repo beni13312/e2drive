@@ -1,5 +1,5 @@
 import React, {useState} from "react";
-import {checkEncryptionPassword, getEmail} from "../api/files.ts";
+import {checkEncryptionPassword, getEmail} from "../api/storage.ts";
 import {generateKDF} from "../core/crypto/kdf.ts";
 
 interface props {

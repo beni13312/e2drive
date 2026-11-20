@@ -77,6 +77,22 @@ export async function uploadChunk(
     });
 }
 
+export async function createFolder(parentId:string | null, encryptedFolderNameBase64:string) {
+    if(!parentId) parentId = "";
+
+    return await api.post("/api/storage/createFolder",
+        {
+            parentId: parentId,
+            folderName: encryptedFolderNameBase64
+        }
+    ).then((res)=>{
+        return res.data;
+    }).catch((error) => {
+        console.log(error.response);
+        return error.response.data;
+    });
+}
+
 export async function downloadFiles(path:string | null) {
     if(!path) path = "/";
 

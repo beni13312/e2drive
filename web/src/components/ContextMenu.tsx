@@ -84,10 +84,10 @@ function ContextMenu({ref, eventState, handleUpload, onNewFolder, posX, posY, ty
           ): (
               <>
                   <ul>
-                      <li className="p-2 hover:bg-app-hover hover:rounded-lg flex cursor-pointer"><ViewIcon className="fill-white mr-2"/> View</li>
-                      <li className="p-2 hover:bg-app-hover hover:rounded-lg flex cursor-pointer"><EditIcon className="fill-white mr-2"/> Rename</li>
-                      <li className="p-2 hover:bg-app-hover hover:rounded-lg flex cursor-pointer"><DownloadIcon className="fill-white mr-2"/> Download</li>
-                      <li className="p-2 hover:bg-app-hover hover:rounded-lg flex cursor-pointer"><DeleteIcon className="fill-white mr-2"/> Delete</li>
+                      <li className="p-2 hover:bg-app-hover hover:rounded-lg flex cursor-pointer"><ViewIcon className="fill-app-text mr-2"/> View</li>
+                      <li className="p-2 hover:bg-app-hover hover:rounded-lg flex cursor-pointer"><EditIcon className="fill-app-text mr-2"/> Rename</li>
+                      <li className="p-2 hover:bg-app-hover hover:rounded-lg flex cursor-pointer"><DownloadIcon className="fill-app-text mr-2"/> Download</li>
+                      <li className="p-2 hover:bg-app-hover hover:rounded-lg flex cursor-pointer"><DeleteIcon className="fill-app-text mr-2"/> Delete</li>
                   </ul>
               </>
           )}
