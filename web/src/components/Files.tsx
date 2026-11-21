@@ -6,11 +6,13 @@ import FileIcon from "../assets/icons/draft.svg?react";
 import FolderIcon from "../assets/icons/folder.svg?react";
 import ContextMenu from "./ContextMenu.tsx";
 import CreateFolder from "./CreateFolder.tsx";
+import E2ee from "../core/crypto/e2ee.ts";
 
 interface props {
+    encryptionKey:Uint8Array;
     onReady: () => void;
     handleUpload: (upload: FileList | null) => void;
-    isUploaded: boolean;
+    refreshTrigger: boolean;
     handleCreateFolder: (parentId: string, folderName: string) => void;
 }
 
@@ -31,7 +33,7 @@ function parseUrl(arrayPath: Array<string>):string{
     return arrayPath.join('/');
 }
 
-function Files({onReady, handleUpload, isUploaded, handleCreateFolder}:props) {
+function Files({encryptionKey, onReady, handleUpload, refreshTrigger, handleCreateFolder}:props) {
     const location = useLocation();
     const navigate = useNavigate();
 
@@ -53,19 +55,33 @@ function Files({onReady, handleUpload, isUploaded, handleCreateFolder}:props) {
 
     // Get file and folder metadata
     useEffect(()  => {
-        // reset the msg useState
+        // Reset the msg useState
         setMsg("");
         const getFilesList = async ()=>{
             let urlPath = location.pathname.replace("/storage", "");
             console.log("Pathname: " + urlPath);
 
-            const result:{path?: filePath[], items?: fileItem[], info?:string, error?:string} = await listFiles(urlPath);
-            if (result.items && result.path){
+            const result:{path: filePath[], items: fileItem[], info?:string, error?:string} = await listFiles(urlPath);
+            if (result.path && result.items){
+                let path:object[] = [];
+                let items:object[] = [];
+
+                const e2ee = await E2ee.new(encryptionKey);
+
+                for (const i of result.path){
+
+                    const decryptedName = await e2ee.decrypt(Uint8Array.from(atob(i.encryptedName), c => c.charCodeAt(0)));
+                }
+
                 setPath([
                     {id:"storage-root", encryptedName: "Storage"},
                     ...result.path
                 ]);
-                setItems(result.items);
+                if(result.info){
+                    setMsg(result.info);
+                }else{
+                    setItems(result.items);
+                }
 
                 urlPath = parseUrl(result.path.map(segment => segment.id));
 
@@ -75,12 +91,6 @@ function Files({onReady, handleUpload, isUploaded, handleCreateFolder}:props) {
                 if (!location.pathname.includes(urlPath)){
                     navigate(urlPath);
                 }
-            }else if(result.info){
-                setPath([
-                    {id:"storage-root", encryptedName: "Storage"},
-                    ...(result.path ?? [])
-                ]);
-                setMsg(result.info);
             }else if(result.error){
                 setMsg(result.error);
             }
@@ -91,7 +101,7 @@ function Files({onReady, handleUpload, isUploaded, handleCreateFolder}:props) {
         getFilesList();
         
          if (onReady) onReady();
-    }, [location.pathname, isUploaded]);
+    }, [location.pathname, refreshTrigger]);
 
 
     // update page title
@@ -105,7 +115,7 @@ function Files({onReady, handleUpload, isUploaded, handleCreateFolder}:props) {
     const handlePathClick = (e, id:string) =>{
         console.log("clicked path: " + id);
 
-        if (id == "storage-root"){
+        if (id === "storage-root"){
             navigate("/storage");
         }
         if (location.pathname.includes(id)){
@@ -188,7 +198,7 @@ function Files({onReady, handleUpload, isUploaded, handleCreateFolder}:props) {
             {
                 isNewFolder && <CreateFolder
                     onCancel={()=> setIsNewFolder(false)}
-                    onCreate={(folderName) => handleCreateFolder(path[-1]?.id ?? "", folderName)} />
+                    onCreate={(folderName) => handleCreateFolder(path[path.length -1]?.id ?? "", folderName)} />
             }
             <div className="storage-path-container flex w-full h-15 sticky top-0 bg-app-card">
                 <button onClick={e => handleNewClick(e)} className="new-button flex ml-5 items-center justify-center cursor-pointer text-on-accent rounded-lg m-2 w-20 h-11 bg-accent hover:bg-accent-hover">

@@ -132,16 +132,14 @@ router.get("/list", async (req, res) => {
 
 
 
-        let response:{path:object[], items:object[]} = {
+        let response:{path:object[], items:object[], info:string} = {
             path: [],
-            items: []
+            items: [],
+            info: ""
 
         };
 
         const dbResult = result[0];
-        if(dbResult.items.length == 0){
-            return res.status(200).json({info: "Empty directory"});
-        }
 
         for (const row of dbResult.path){
             response.path.push({
@@ -149,6 +147,12 @@ router.get("/list", async (req, res) => {
                 encryptedName: row.encrypted_name,
             });
         }
+
+        if(dbResult.items.length === 0){
+            response.info = "Empty directory";
+            return res.status(200).json(response);
+        }
+
         for (const row of dbResult.items){
             response.items.push({
                 id: row.id,

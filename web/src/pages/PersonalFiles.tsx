@@ -23,7 +23,7 @@ function PersonalFiles({onLogout, encryptionKey}:props){
     const [isLoaded, setIsLoaded] = useState(false);
     const [profileName, setProfileName] = useState("");
     const [isProfileDropDown, setProfileDropDown] = useState(false);
-    const [isUploaded, setIsUploaded] = useState(false);
+    const [refreshTrigger, setRefreshTrigger] = useState(false);
 
     const profileDropDownRef = useRef<HTMLLIElement>(null);
 
@@ -95,7 +95,7 @@ function PersonalFiles({onLogout, encryptionKey}:props){
             });
 
             const result = await uploadChunk(dataStream);
-            setIsUploaded(true);
+            setRefreshTrigger(!refreshTrigger);
         }
 
     };
@@ -106,7 +106,7 @@ function PersonalFiles({onLogout, encryptionKey}:props){
         const encryptedFolderName = await e2ee.encrypt(Uint8Array.from(folderName));
         const encryptedFolderNameeBase64 = btoa(String.fromCodePoint(...encryptedFolderName));
         console.log("Base64FileName: " + encryptedFolderNameeBase64);
-        const result = createFolder(parentId,encryptedFolderNameeBase64);
+        const result = createFolder(parentId, encryptedFolderNameeBase64);
     }
 
     useEffect(() => {
@@ -168,9 +168,10 @@ function PersonalFiles({onLogout, encryptionKey}:props){
                     </header>
                     <main className="main w-full min-h-0 flex-1 mb-10">
                            <Files
+                               encryptionKey={encryptionKey}
                                onReady={()=> setIsLoaded(true)}
                                handleUpload={handleUpload}
-                               isUploaded={isUploaded}
+                               refreshTrigger={refreshTrigger}
                                handleCreateFolder={handleCreateFolder}
                            />
                     </main>
