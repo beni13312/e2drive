@@ -45,7 +45,7 @@ export default class E2ee {
             this.key.buffer as ArrayBuffer,
             {name: "aes-gcm"},
             false,
-            ["encrypt"]
+            ["decrypt"]
         );
 
         return new Uint8Array(await crypto.subtle.decrypt(

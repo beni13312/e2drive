@@ -29,6 +29,20 @@ interface filePath{
     encryptedName:string
 }
 
+interface decryptedFilePath{
+    id: string,
+    name:string
+}
+
+interface decryptedFileItem{
+    id: string,
+    type: string,
+    name: string,
+    size: string,
+    modDate: string
+}
+
+
 function parseUrl(arrayPath: Array<string>):string{
     return arrayPath.join('/');
 }
@@ -37,17 +51,16 @@ function Files({encryptionKey, onReady, handleUpload, refreshTrigger, handleCrea
     const location = useLocation();
     const navigate = useNavigate();
 
-    const [path, setPath] = useState<filePath[]>([
-        {id:"storage-root", encryptedName: "Storage"} // the root placeholder
-    ]);
-
     const [contextMenu, setContextMenu] = useState({
         visible: false,
         x: 0,
         y: 0,
         type: ""
     });
-    const [items, setItems] = useState<fileItem[]>([]);
+    const [path, setPath] = useState<decryptedFilePath[]>([
+        {id:"storage-root", name: "Storage"} // the root placeholder
+    ]);
+    const [items, setItems] = useState<decryptedFileItem[]>([]);
     const [msg, setMsg] = useState<string>("");
     const [isNewFolder, setIsNewFolder] = useState(false);
 
@@ -63,24 +76,38 @@ function Files({encryptionKey, onReady, handleUpload, refreshTrigger, handleCrea
 
             const result:{path: filePath[], items: fileItem[], info?:string, error?:string} = await listFiles(urlPath);
             if (result.path && result.items){
-                let path:object[] = [];
-                let items:object[] = [];
+                let path: decryptedFilePath[] = [];
+                let items:decryptedFileItem[] = [];
 
                 const e2ee = await E2ee.new(encryptionKey);
+                const decoder = new TextDecoder("utf-8");
 
                 for (const i of result.path){
+                    const decryptedData = await e2ee.decrypt(Uint8Array.from(atob(i.encryptedName), c => c.charCodeAt(0)));
+                    path.push({id: i.id, name: decoder.decode(decryptedData)});
+                }
+                for (const i of result.items){
+                    const decryptedData = await e2ee.decrypt(Uint8Array.from(atob(i.encryptedName), c => c.charCodeAt(0)));
+                    items.push(
+                        {
+                            id: i.id,
+                            type: i.type,
+                            name: decoder.decode(decryptedData),
+                            size: i.size,
+                            modDate: i.modDate
 
-                    const decryptedName = await e2ee.decrypt(Uint8Array.from(atob(i.encryptedName), c => c.charCodeAt(0)));
+                        }
+                    );
                 }
 
                 setPath([
-                    {id:"storage-root", encryptedName: "Storage"},
-                    ...result.path
+                    {id:"storage-root", name: "Storage"},
+                    ...path
                 ]);
                 if(result.info){
                     setMsg(result.info);
                 }else{
-                    setItems(result.items);
+                    setItems(items);
                 }
 
                 urlPath = parseUrl(result.path.map(segment => segment.id));
@@ -108,7 +135,7 @@ function Files({encryptionKey, onReady, handleUpload, refreshTrigger, handleCrea
     useEffect(()=>{
         const currentPath = path[path.length -1];
 
-        document.title = currentPath ? `E2Drive - ${currentPath.encryptedName}` : "E2Drive - Storage"
+        document.title = currentPath ? `E2Drive - ${currentPath.name}` : "E2Drive - Storage"
     }, [path]);
 
 
@@ -198,7 +225,7 @@ function Files({encryptionKey, onReady, handleUpload, refreshTrigger, handleCrea
             {
                 isNewFolder && <CreateFolder
                     onCancel={()=> setIsNewFolder(false)}
-                    onCreate={(folderName) => handleCreateFolder(path[path.length -1]?.id ?? "", folderName)} />
+                    onCreate={(folderName) => handleCreateFolder(path[path.length -1]?.id === "storage-root" ? "" : path[path.length -1]?.id, folderName)} />
             }
             <div className="storage-path-container flex w-full h-15 sticky top-0 bg-app-card">
                 <button onClick={e => handleNewClick(e)} className="new-button flex ml-5 items-center justify-center cursor-pointer text-on-accent rounded-lg m-2 w-20 h-11 bg-accent hover:bg-accent-hover">
@@ -208,7 +235,9 @@ function Files({encryptionKey, onReady, handleUpload, refreshTrigger, handleCrea
                     {
                         path.map((segment, index) => (
                             <>
-                                <div onClick={e => handlePathClick(e, segment.id)} className={`m-1 p-1 cursor-pointer hover:bg-app-hover rounded-lg ${index < path.length - 1 ? "text-app-unfocused" : "text-app-text"}`} id={segment.id} key={segment.id}>{segment.encryptedName}</div>
+                                <div onClick={e => handlePathClick(e, segment.id)}
+                                     className={`m-1 p-1 cursor-pointer hover:bg-app-hover rounded-lg ${index < path.length - 1 ? "text-app-unfocused" : "text-app-text"}`}
+                                     id={segment.id} key={segment.id}>{segment.name}</div>
                                 {index < path.length - 1 && (
                                     <div className="text-app-unfocused">/</div>
                                 )}
@@ -253,7 +282,7 @@ function Files({encryptionKey, onReady, handleUpload, refreshTrigger, handleCrea
                                             item.type === "file" ? <FileIcon className="w-7 h-7 fill-file-icon"/> : <FolderIcon className="w-7 h-7 fill-folder-icon"/>
                                         }
                                     </td>
-                                    <td className="py-1 border-b border-app-border px-4">{item.encryptedName}</td>
+                                    <td className="py-1 border-b border-app-border px-4">{item.name}</td>
                                     <td className="py-1 border-b border-app-border px-4">{item.size}B</td>
                                     <td className="py-1 border-b border-app-border px-4">{String(item.modDate).slice(0, 10).replaceAll('-', '.')}</td>
                                 </tr>

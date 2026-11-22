@@ -6,7 +6,10 @@ SELECT users.password_hash FROM users JOIN sessions ON sessions.user_id = users.
 
 select users.id from users join sessions on sessions.user_id = users.id where sessions.token = 'bd7196ab7e8fa8b0f7c13504ae54c793ba31d79958d32a4fd797fb93aece3844';
 
-truncate table sessions restart identity;
+-- clear tables
+truncate table sessions cascade;
+truncate table files cascade;
+truncate table folders cascade;
 
 -- list from root folder
 select id, encrypted_name, size, modified_at from files where parent_id is null;

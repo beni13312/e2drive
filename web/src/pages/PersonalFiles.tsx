@@ -60,7 +60,8 @@ function PersonalFiles({onLogout, encryptionKey}:props){
         for (const f of upload){
             console.log("Upload: " + f.name + "file size: " + Math.floor(f.size / 1024) + "KB");
 
-            const encryptedFileName = await e2ee.encrypt(Uint8Array.from(f.name));
+            const encoder = new TextEncoder();
+            const encryptedFileName = await e2ee.encrypt(encoder.encode(f.name));
             const encryptedFileNameBase64 = btoa(String.fromCodePoint(...encryptedFileName));
             console.log("Base64FileName: " + encryptedFileNameBase64);
 
@@ -102,11 +103,13 @@ function PersonalFiles({onLogout, encryptionKey}:props){
 
     const handleCreateFolder = async (parentId:string, folderName:string)=>{
         const e2ee = await E2ee.new(encryptionKey);
+        const encoder = new TextEncoder();
 
-        const encryptedFolderName = await e2ee.encrypt(Uint8Array.from(folderName));
+        const encryptedFolderName = await e2ee.encrypt(encoder.encode(folderName));
         const encryptedFolderNameeBase64 = btoa(String.fromCodePoint(...encryptedFolderName));
         console.log("Base64FileName: " + encryptedFolderNameeBase64);
         const result = createFolder(parentId, encryptedFolderNameeBase64);
+        setRefreshTrigger(!refreshTrigger);
     }
 
     useEffect(() => {
