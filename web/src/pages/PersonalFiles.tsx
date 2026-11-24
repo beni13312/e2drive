@@ -12,12 +12,12 @@ import InformationIcon from "../assets/icons/info.svg?react"
 import LogOutIcon from "../assets/icons/logout.svg?react";
 import SearchIcon from "../assets/icons/search.svg?react";
 
-interface props{
+interface Props{
     onLogout: () => void,
     encryptionKey: Uint8Array
 }
 
-function PersonalFiles({onLogout, encryptionKey}:props){
+function PersonalFiles({onLogout, encryptionKey}:Props){
     const navigate = useNavigate();
 
     const [isLoaded, setIsLoaded] = useState(false);
@@ -108,7 +108,7 @@ function PersonalFiles({onLogout, encryptionKey}:props){
         const encryptedFolderName = await e2ee.encrypt(encoder.encode(folderName));
         const encryptedFolderNameeBase64 = btoa(String.fromCodePoint(...encryptedFolderName));
         console.log("Base64FileName: " + encryptedFolderNameeBase64);
-        const result = createFolder(parentId, encryptedFolderNameeBase64);
+        const result = await createFolder(parentId, encryptedFolderNameeBase64);
         setRefreshTrigger(!refreshTrigger);
     }
 

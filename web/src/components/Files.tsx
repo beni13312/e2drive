@@ -8,7 +8,7 @@ import ContextMenu from "./ContextMenu.tsx";
 import CreateFolder from "./CreateFolder.tsx";
 import E2ee from "../core/crypto/e2ee.ts";
 
-interface props {
+interface Props {
     encryptionKey:Uint8Array;
     onReady: () => void;
     handleUpload: (upload: FileList | null) => void;
@@ -16,7 +16,12 @@ interface props {
     handleCreateFolder: (parentId: string, folderName: string) => void;
 }
 
-interface fileItem{
+interface FilePath{
+    id: string,
+    encryptedName:string
+}
+
+interface FileItem{
     id: string,
     type: string,
     encryptedName: string,
@@ -24,22 +29,12 @@ interface fileItem{
     modDate: string
 }
 
-interface filePath{
-    id: string,
-    encryptedName:string
-}
-
-interface decryptedFilePath{
-    id: string,
+interface DecryptedFilePath extends Omit<FilePath, "encryptedName">{
     name:string
 }
 
-interface decryptedFileItem{
-    id: string,
-    type: string,
+interface DecryptedFileItem extends Omit<FileItem, "encryptedName">{
     name: string,
-    size: string,
-    modDate: string
 }
 
 
@@ -47,7 +42,7 @@ function parseUrl(arrayPath: Array<string>):string{
     return arrayPath.join('/');
 }
 
-function Files({encryptionKey, onReady, handleUpload, refreshTrigger, handleCreateFolder}:props) {
+function Files({encryptionKey, onReady, handleUpload, refreshTrigger, handleCreateFolder}:Props) {
     const location = useLocation();
     const navigate = useNavigate();
 
@@ -57,10 +52,10 @@ function Files({encryptionKey, onReady, handleUpload, refreshTrigger, handleCrea
         y: 0,
         type: ""
     });
-    const [path, setPath] = useState<decryptedFilePath[]>([
+    const [path, setPath] = useState<DecryptedFilePath[]>([
         {id:"storage-root", name: "Storage"} // the root placeholder
     ]);
-    const [items, setItems] = useState<decryptedFileItem[]>([]);
+    const [items, setItems] = useState<DecryptedFileItem[]>([]);
     const [msg, setMsg] = useState<string>("");
     const [isNewFolder, setIsNewFolder] = useState(false);
 
@@ -71,13 +66,13 @@ function Files({encryptionKey, onReady, handleUpload, refreshTrigger, handleCrea
         // Reset the msg useState
         setMsg("");
         const getFilesList = async ()=>{
-            let urlPath = location.pathname.replace("/storage", "");
+            const urlPath = location.pathname.replace("/storage", "");
             console.log("Pathname: " + urlPath);
 
-            const result:{path: filePath[], items: fileItem[], info?:string, error?:string} = await listFiles(urlPath);
+            const result:{path: FilePath[], items: FileItem[], info?:string, error?:string} = await listFiles(urlPath);
             if (result.path && result.items){
-                let path: decryptedFilePath[] = [];
-                let items:decryptedFileItem[] = [];
+                let path: DecryptedFilePath[] = [];
+                let items:DecryptedFileItem[] = [];
 
                 const e2ee = await E2ee.new(encryptionKey);
                 const decoder = new TextDecoder("utf-8");
@@ -110,18 +105,20 @@ function Files({encryptionKey, onReady, handleUpload, refreshTrigger, handleCrea
                     setItems(items);
                 }
 
-                urlPath = parseUrl(result.path.map(segment => segment.id));
+                const parsedPath = parseUrl(result.path.map(segment => segment.id));
 
-                console.log("URL parsed path: " + urlPath);
+                console.log("URL parsed path: " + parsedPath);
 
                 // Navigate only if the pathname does not include the path already
-                if (!location.pathname.includes(urlPath)){
-                    navigate(urlPath);
-                }
+                // if (!location.pathname.includes(parsedPath)){
+                //     navigate(parsedPath);
+                // }
             }else if(result.error){
                 setMsg(result.error);
             }
+            console.log("Path: ");
             console.log(result.path);
+            console.log("Items: ");
             console.log(result.items);
         }
 
@@ -139,7 +136,7 @@ function Files({encryptionKey, onReady, handleUpload, refreshTrigger, handleCrea
     }, [path]);
 
 
-    const handlePathClick = (e, id:string) =>{
+    const handlePathClick = (_e: React.MouseEvent, id:string) =>{
         console.log("clicked path: " + id);
 
         if (id === "storage-root"){
@@ -147,18 +144,27 @@ function Files({encryptionKey, onReady, handleUpload, refreshTrigger, handleCrea
         }
         if (location.pathname.includes(id)){
             console.log("ID: " + id);
-            navigate(`/storage/${id}`);
+
+            let navigatePathArray:string[] = [];
+            for (const e of path){
+                if (e.id !== "storage-root") {
+                    navigatePathArray.push(e.id);
+                }
+                if (e.id === id) break;
+            }
+            const parsedPath = parseUrl(navigatePathArray)
+            navigate(`/storage/${parsedPath}`);
         }
     };
 
-    const handleItemClick = (e:MouseEvent<HTMLTableRowElement>, id:string, type:string)=> {
+    const handleItemClick = (_e:React.MouseEvent, id:string, type:string)=> {
       console.log("clicked: " + id + ' ' + type);
 
       if (type === "folder"){
           // Navigate only if the pathname does not include the path already
           if (location.pathname != location.pathname + id){
               console.log("ID: " + id);
-              navigate(`${id}`);
+              navigate(`${location.pathname}/${id}`);
           }
       }
     };
@@ -185,7 +191,7 @@ function Files({encryptionKey, onReady, handleUpload, refreshTrigger, handleCrea
     }
 
 
-    const handleNewClick = (e:MouseEvent)=>{
+    const handleNewClick = (e:React.MouseEvent)=>{
         e.stopPropagation();
         !contextMenu.visible ?
             setContextMenu({

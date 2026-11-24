@@ -1,12 +1,12 @@
 import React, {useState} from "react";
 
-interface props{
+interface Props{
     onCancel: () => void,
     onCreate: (folderName:string) => void
 
 }
 
-function CreateFolder({onCancel, onCreate}:props){
+function CreateFolder({onCancel, onCreate}:Props){
 
     const [folderName, setFolderName] = useState<string>("New Folder");
 

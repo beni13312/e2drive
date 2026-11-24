@@ -4,12 +4,12 @@ import {useNavigate} from "react-router-dom";
 import Logo from "../assets/logo/logo.svg?react";
 import {generateKDF} from "../core/crypto/kdf.ts";
 
-interface props{
+interface Props{
     onLogin: () => void,
     setEncryptionPassword: Dispatch<SetStateAction<Uint8Array>>
 }
 
-function Login({onLogin, setEncryptionPassword}:props){
+function Login({onLogin, setEncryptionPassword}:Props){
     const navigate = useNavigate();
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");

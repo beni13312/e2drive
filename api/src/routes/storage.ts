@@ -105,9 +105,12 @@ router.get("/list", async (req, res) => {
 
                             -- get folder path
                             folderPath AS (
-                                SELECT id, encode(encrypted_name, 'base64') as encrypted_name
-                                FROM folders WHERE  id=ANY(${urlFolderPathArray}::UUID[])
+                                SELECT folders.id, encode(encrypted_name, 'base64') as encrypted_name
+                                FROM unnest(${urlFolderPathArray}::UUID[]) WITH ORDINALITY AS u(id, ord) 
+                                JOIN folders ON folders.id = u.id
+                                WHERE folders.id=ANY(${urlFolderPathArray}::UUID[])
                                 AND owner_id=(SELECT id FROM "current_user")
+                                ORDER BY u.ord
                             ),
                             
                             -- get files and folders

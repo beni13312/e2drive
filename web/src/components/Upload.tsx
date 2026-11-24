@@ -1,11 +1,12 @@
 import React from "react";
-interface props {
+
+interface Props {
     ref: React.RefObject<HTMLInputElement | null>,
     eventState: () => void,
     handleUpload: (files:FileList) => void
 }
 
-export function UploadFile({ref, eventState, handleUpload}:props){
+export function UploadFile({ref, eventState, handleUpload}:Props){
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>)=>{
         const file = e.target.files;
         console.log(file);
@@ -19,7 +20,7 @@ export function UploadFile({ref, eventState, handleUpload}:props){
         </>
     );
 }
-export function UploadFolder({ref, eventState, handleUpload}:props){
+export function UploadFolder({ref, eventState, handleUpload}:Props){
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>)=>{
         const folder = e.target.files;
         console.log(folder);
@@ -29,7 +30,7 @@ export function UploadFolder({ref, eventState, handleUpload}:props){
     }
     return (
         <>
-            <input onChange={handleChange} ref={ref} className="hidden" type="file" webkitdirectory=""/>
+            <input onChange={handleChange} ref={ref} className="hidden" type="file"  {...{ webkitdirectory: '' }}/>
         </>
     );
 }

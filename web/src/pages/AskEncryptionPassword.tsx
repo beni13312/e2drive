@@ -2,11 +2,11 @@ import React, {useState} from "react";
 import {checkEncryptionPassword, getEmail} from "../api/storage.ts";
 import {generateKDF} from "../core/crypto/kdf.ts";
 
-interface props {
+interface Props {
     setEncryptionKey: (encryptionKey:Uint8Array) => void
 }
 
-function AskEncryptionPassword({setEncryptionKey}:props){
+function AskEncryptionPassword({setEncryptionKey}:Props){
     const [password, setPassword] = useState("");
     const [errorMsg, setErrorMsg] = useState("");
 

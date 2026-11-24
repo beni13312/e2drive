@@ -8,7 +8,7 @@ import DeleteIcon from "../assets/icons/delete.svg?react";
 import ViewIcon from "../assets/icons/view.svg?react";
 import EditIcon from "../assets/icons/edit.svg?react";
 
-interface props {
+interface Props {
     ref: React.RefObject<HTMLDivElement | null>,
     eventState: () => void,
     handleUpload: (files:FileList | null) => void,
@@ -18,7 +18,7 @@ interface props {
     type: "general" | "entry" | string
 }
 
-function ContextMenu({ref, eventState, handleUpload, onNewFolder, posX, posY, type}:props){
+function ContextMenu({ref, eventState, handleUpload, onNewFolder, posX, posY, type}:Props){
 
     const uploadFileRef = useRef<HTMLInputElement>(null);
     const uploadFolderRef = useRef<HTMLInputElement>(null);
