@@ -35,3 +35,21 @@ insert into folders (owner_id, parent_id, encrypted_name, size) VALUES (1, 1, '\
 
 select * from files;
 select * from folders;
+
+
+
+-- constructing the folder path with query
+WITH RECURSIVE folderPath AS (
+    SELECT id, parent_id, encrypted_name, 1 AS depth
+    FROM folders
+    WHERE id = '84fa90de-b8b0-4236-a0ec-b61761c1c39d'::uuid
+
+    UNION ALL
+
+    SELECT f.id, f.parent_id, f.encrypted_name, fp.depth + 1
+    FROM folders as f
+             JOIN folderPath as fp ON f.id = fp.parent_id
+)
+SELECT id, encrypted_name
+FROM folderPath
+ORDER BY depth DESC;
