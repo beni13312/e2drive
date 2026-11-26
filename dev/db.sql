@@ -43,12 +43,14 @@ WITH RECURSIVE folderPath AS (
     SELECT id, parent_id, encrypted_name, 1 AS depth
     FROM folders
     WHERE id = '84fa90de-b8b0-4236-a0ec-b61761c1c39d'::uuid
+    AND owner_id = '7162156f-2c8c-48f8-be53-bd94d4042fd6'
 
     UNION ALL
 
     SELECT f.id, f.parent_id, f.encrypted_name, fp.depth + 1
     FROM folders as f
-             JOIN folderPath as fp ON f.id = fp.parent_id
+    JOIN folderPath as fp ON f.id = fp.parent_id
+    WHERE f.owner_id = '7162156f-2c8c-48f8-be53-bd94d4042fd6'
 )
 SELECT id, encrypted_name
 FROM folderPath

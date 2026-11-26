@@ -2,6 +2,7 @@ import {Router} from "express";
 import crypto from "node:crypto";
 import db from "../database/connection.js";
 import * as argon2 from "argon2";
+import Filesystem from "../storage/filesystem.js";
 
 const router = Router();
 
@@ -77,10 +78,8 @@ router.get("/list", async (req, res) => {
             return res.status(400).json({error: "Failed to get requested path"});
         }
 
-        const parentId:string = requestedPath.split('/').filter(Boolean).at(-1) ?? "";
-        const urlFolderPathArray:string[] = requestedPath.split('/').map(e => e.trim()).filter(Boolean);
-        console.log("parentId", parentId);
-        console.log("urlFolderPathArray: " + urlFolderPathArray);
+        const folderId:string = requestedPath.split('/').filter(Boolean).at(-1) ?? "";
+        console.log("folderId: ", folderId);
 
         interface DbResponse{
             path: {
@@ -98,29 +97,38 @@ router.get("/list", async (req, res) => {
         }
 
         const result = await db()<DbResponse[]>`
-                            WITH "current_user" AS (
+                            WITH RECURSIVE "current_user" AS (
                               SELECT users.id from users 
                               JOIN sessions ON sessions.user_id = users.id WHERE sessions.token = ${tokenHash}
                             ),
 
                             -- get folder path
-                            folderPath AS (
-                                SELECT folders.id, encode(encrypted_name, 'base64') as encrypted_name
-                                FROM unnest(${urlFolderPathArray}::UUID[]) WITH ORDINALITY AS u(id, ord) 
-                                JOIN folders ON folders.id = u.id
-                                WHERE folders.id=ANY(${urlFolderPathArray}::UUID[])
-                                AND owner_id=(SELECT id FROM "current_user")
-                                ORDER BY u.ord
-                            ),
+                            folderPathConstruct AS (
+                                    SELECT id, parent_id, encode(encrypted_name, 'base64') AS encrypted_name, 1 AS depth
+                                    FROM folders
+                                    WHERE id IS NOT DISTINCT FROM NULLIF(${folderId}, '')::uuid
+                                    AND owner_id=(SELECT id FROM "current_user")
+                                     UNION ALL
+                                    SELECT f.id, f.parent_id, encode(f.encrypted_name, 'base64') AS encrypted_name, fp.depth + 1
+                                    FROM folders as f
+                                    JOIN folderPathConstruct as fp ON f.id = fp.parent_id
+                                    WHERE f.owner_id=(SELECT id FROM "current_user")
+                                ),
+                                folderPath AS (
+                                    SELECT id, encrypted_name
+                                    FROM folderPathConstruct
+                                    ORDER BY depth DESC
+                                ),
+
                             
                             -- get files and folders
                             folderItems AS (
-                                SELECT id, 'file' AS type, encode(encrypted_name, 'base64') as encrypted_name, size, modified_at 
-                                FROM files WHERE parent_id IS NOT DISTINCT FROM NULLIF(${parentId}, '')::UUID
+                                SELECT id, 'file' AS type, encode(encrypted_name, 'base64') AS encrypted_name, size, modified_at 
+                                FROM files WHERE parent_id IS NOT DISTINCT FROM NULLIF(${folderId}, '')::UUID
                                 AND owner_id=(SELECT id FROM "current_user")
                                   UNION ALL
-                                SELECT id, 'folder' AS type, encode(encrypted_name, 'base64') as encrypted_name, size, modified_at 
-                                FROM folders WHERE parent_id IS NOT DISTINCT FROM NULLIF(${parentId}, '')::UUID
+                                SELECT id, 'folder' AS type, encode(encrypted_name, 'base64') AS encrypted_name, size, modified_at 
+                                FROM folders WHERE parent_id IS NOT DISTINCT FROM NULLIF(${folderId}, '')::UUID
                                 AND owner_id=(SELECT id FROM "current_user")
                                 )
                             
@@ -231,13 +239,13 @@ router.post("/uploadMetadata", async (req, res) => {
 
 router.post("/uploadChunk", async (req, res) => {
     try{
+        const fs = new Filesystem();
         req.on('data', (chunk: Buffer) => {
             console.log(`Chunk size: ${chunk.length} Byte`);
+            const receivedBuffer:ArrayBufferLike = chunk.buffer;
+
         });
 
-        const body = req.body;
-        const writePath = req.headers.path;
-        const dataBytes = req.headers.dataSize;
 
 
         return res.status(200).json({});

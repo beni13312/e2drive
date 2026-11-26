@@ -37,11 +37,6 @@ interface DecryptedFileItem extends Omit<FileItem, "encryptedName">{
     name: string,
 }
 
-
-function parseUrl(arrayPath: Array<string>):string{
-    return arrayPath.join('/');
-}
-
 function Files({encryptionKey, onReady, handleUpload, refreshTrigger, handleCreateFolder}:Props) {
     const location = useLocation();
     const navigate = useNavigate();
@@ -105,14 +100,6 @@ function Files({encryptionKey, onReady, handleUpload, refreshTrigger, handleCrea
                     setItems(items);
                 }
 
-                const parsedPath = parseUrl(result.path.map(segment => segment.id));
-
-                console.log("URL parsed path: " + parsedPath);
-
-                // Navigate only if the pathname does not include the path already
-                // if (!location.pathname.includes(parsedPath)){
-                //     navigate(parsedPath);
-                // }
             }else if(result.error){
                 setMsg(result.error);
             }
@@ -141,19 +128,9 @@ function Files({encryptionKey, onReady, handleUpload, refreshTrigger, handleCrea
 
         if (id === "storage-root"){
             navigate("/storage");
-        }
-        if (location.pathname.includes(id)){
+        }else{
             console.log("ID: " + id);
-
-            let navigatePathArray:string[] = [];
-            for (const e of path){
-                if (e.id !== "storage-root") {
-                    navigatePathArray.push(e.id);
-                }
-                if (e.id === id) break;
-            }
-            const parsedPath = parseUrl(navigatePathArray)
-            navigate(`/storage/${parsedPath}`);
+            navigate(`/storage/${id}`);
         }
     };
 
@@ -164,7 +141,7 @@ function Files({encryptionKey, onReady, handleUpload, refreshTrigger, handleCrea
           // Navigate only if the pathname does not include the path already
           if (location.pathname != location.pathname + id){
               console.log("ID: " + id);
-              navigate(`${location.pathname}/${id}`);
+              navigate(`/storage/${id}`);
           }
       }
     };
@@ -254,7 +231,9 @@ function Files({encryptionKey, onReady, handleUpload, refreshTrigger, handleCrea
                 </div>
             </div>
             {
-                (msg.length !== 0) ? (<div className="errorMsg text-2xl ml-5 mt-5">{msg}</div>) : (
+                (msg.length !== 0) ? (<div className="errorMsg text-2xl ml-5 mt-5 flex-1"
+                                           onContextMenu={(e) => handleContextMenu(e, "general")}>{msg}</div>)
+                    : (
 
                 <div onContextMenu={(e) => handleContextMenu(e, "general")} className="files-table-container flex-1">
 
