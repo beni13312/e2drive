@@ -3,6 +3,7 @@ import crypto from "node:crypto";
 import db from "../database/connection.js";
 import * as argon2 from "argon2";
 import Filesystem from "../storage/filesystem.js";
+import Config from "../config/config.js";
 
 const router = Router();
 
@@ -192,10 +193,10 @@ router.post("/uploadMetadata", async (req, res) => {
 
         const tokenHash = crypto.hash("sha256", sessionCookie);
 
-        const requestedPath = String(req.query.path);
-        console.log("Requested Path: " + requestedPath);
+        const requestedUploadPathId = String(req.query.id);
+        console.log("Requested pathId: " + requestedUploadPathId);
 
-        if(!requestedPath){
+        if(!requestedUploadPathId){
             return res.status(400).json({error: "Failed to get requested path"});
         }
 
@@ -203,8 +204,8 @@ router.post("/uploadMetadata", async (req, res) => {
             return res.status(400).json({error: "Failed to read request"});
         }
 
-        const parentId:string = requestedPath.split('/').filter(Boolean).at(-1) ?? "";
-        console.log("parentId", parentId);
+        const pathId:string = requestedUploadPathId ?? "";
+        console.log("folderId", pathId);
 
         const body = req.body;
 
@@ -220,7 +221,7 @@ router.post("/uploadMetadata", async (req, res) => {
                         VALUES (
                         (SELECT users.id FROM users
                         JOIN sessions ON sessions.user_id = users.id WHERE sessions.token=${tokenHash}),
-                                NULLIF(${parentId}, '')::UUID,
+                                NULLIF(${pathId}, '')::UUID,
                                 ${filenameBytes},
                                 ${size},
                                 ${modDate}
@@ -233,23 +234,41 @@ router.post("/uploadMetadata", async (req, res) => {
 
         return res.status(200).json(result[0]);
     }catch (error){
+        console.log(error);
         return res.status(500).json({error: "Failed to upload files"});
     }
 });
 
 router.post("/uploadChunk", async (req, res) => {
     try{
+        const fileId = req.query.id;
+        console.log("fileId: " + fileId);
+        if(!fileId){
+            return res.status(400).json({error: "Failed to upload file: fileId is not provided"});
+        }
+
         const fs = new Filesystem();
-        req.on('data', (chunk: Buffer) => {
-            console.log(`Chunk size: ${chunk.length} Byte`);
-            const receivedBuffer:ArrayBufferLike = chunk.buffer;
+        if(!await fs.isExists(Config.DATA_STORAGE)){
+            return res.status(500).json({error: "Failed to upload file: storage directory does not exists"});
+        }
 
-        });
+        const filePath = `${Config.DATA_STORAGE}/${fileId}`;
+        console.log("filePath: " + filePath);
+        const file = await fs.open(filePath,'a');
 
+        // writing received chunks into file
+        try{
+            for await (const chunk of req) {
+                console.log(`Chunk size: ${chunk.length} Byte`);
+                await file.appendFile(chunk);
+            }
+        }finally {
+            await file.close();
+        }
 
-
-        return res.status(200).json({});
+        return res.status(200).json({uploadChunk: true});
     }catch (error){
+        console.log(error);
         return res.status(500).json({error: "Failed to upload files"});
     }
 });
@@ -285,6 +304,7 @@ router.post("/createFolder", async (req,res)=>{
 
         return res.status(200).json({createFolder:true});
     }catch (error){
+        console.log(error);
         return res.status(500).json({error: "Failed to create folder"});
     }
 });
@@ -293,8 +313,29 @@ router.post("/createFolder", async (req,res)=>{
 
 router.get("/downlaod", async (req, res) => {
     try{
+        const sessionCookie = req.cookies["session"];
+
+        const tokenHash = crypto.hash("sha256", sessionCookie);
+
+        const fileId = String(req.query.id);
+        console.log("Requested Path: " + fileId);
+
+        if(!fileId){
+            return res.status(400).json({error: "Failed to get requested fileId"});
+        }
+
+        if(!req.body){
+            return res.status(400).json({error: "Failed to read request"});
+        }
+
+        console.log("fileId", fileId);
+
+        const result = await db()`SELECT 1 FROM files 
+                                    JOIN sessions ON sessions.id=owner_id 
+                                    WHERE sessions.token=${tokenHash} AND files.id=${fileId}`;
 
     }catch (error){
+        console.log(error);
         return res.status(500).json({error: "Failed to download files"});
     }
 });

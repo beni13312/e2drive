@@ -56,7 +56,7 @@ function PersonalFiles({onLogout, encryptionKey}:Props){
             console.log("folder");
         }
 
-        const urlPath = location.pathname.replace("/storage", "");
+        const urlPathId = location.pathname.replace("/storage/", "");
         for (const f of upload){
             console.log("Upload: " + f.name + "file size: " + Math.floor(f.size / 1024) + "KB");
 
@@ -65,9 +65,13 @@ function PersonalFiles({onLogout, encryptionKey}:Props){
             const encryptedFileNameBase64 = btoa(String.fromCodePoint(...encryptedFileName));
             console.log("Base64FileName: " + encryptedFileNameBase64);
 
-            const uploadFileInfo = await uploadMetaData(String(urlPath), encryptedFileNameBase64, f.size, String(f.lastModified));
-            if (uploadFileInfo.id){
+            const uploadFileInfo = await uploadMetaData(String(urlPathId), encryptedFileNameBase64, f.size, String(f.lastModified));
+            const fileId = uploadFileInfo.id;
+            if (fileId){
                 console.log("file ID in database: " + uploadFileInfo.id);
+            }else{
+                console.error("Error while uploading file metadata");
+                return;
             }
 
             let bufferSize = 64 * 1024 // 64KB
@@ -95,7 +99,10 @@ function PersonalFiles({onLogout, encryptionKey}:Props){
                     }
             });
 
-            const result = await uploadChunk(dataStream);
+            const uploadResult = await uploadChunk(dataStream, fileId);
+            if (uploadResult.uploadChunk){
+                console.log("Upload finished");
+            }
             setRefreshTrigger(!refreshTrigger);
         }
 
@@ -109,6 +116,9 @@ function PersonalFiles({onLogout, encryptionKey}:Props){
         const encryptedFolderNameeBase64 = btoa(String.fromCodePoint(...encryptedFolderName));
         console.log("Base64FileName: " + encryptedFolderNameeBase64);
         const result = await createFolder(parentId, encryptedFolderNameeBase64);
+        if(result.createFolder){
+            console.log("folder created");
+        }
         setRefreshTrigger(!refreshTrigger);
     }
 

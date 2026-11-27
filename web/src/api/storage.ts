@@ -34,15 +34,15 @@ export async function listFiles(path:string | null) {
 }
 
 export async function uploadMetaData(
-    path:string | null,
+    pathId:string | null,
     encryptedFilenameBase64:string,
     size: number,
     modDate:string
 )
 {
-    if(!path) path = "/";
+    if(!pathId) pathId = "/";
 
-    return await api.post(`/api/storage/uploadMetaData?path=${encodeURIComponent(path)}`,
+    return await api.post(`/api/storage/uploadMetaData?id=${encodeURIComponent(pathId)}`,
         {
             filename: encryptedFilenameBase64,
             dataSize: size,
@@ -57,10 +57,11 @@ export async function uploadMetaData(
 }
 
 export async function uploadChunk(
-    fileStream:ReadableStream
+    fileStream:ReadableStream,
+    fileId: string
 )
 {
-    return await fetch(`${baseURL}/api/storage/uploadChunk`, {
+    return await fetch(`${baseURL}/api/storage/uploadChunk?id=${fileId}`, {
         method: "POST",
         credentials: "include",
         headers: {
@@ -70,7 +71,8 @@ export async function uploadChunk(
         // @ts-ignore
         duplex: "half"
     }).then(async (res)=>{
-        return res.status;
+        if(!res.ok) return res.status;
+        return res.json();
     }).catch((error) => {
         console.log(error.messsage);
         return error.message;
@@ -93,10 +95,9 @@ export async function createFolder(parentId:string | null, encryptedFolderNameBa
     });
 }
 
-export async function downloadFiles(path:string | null) {
-    if(!path) path = "/";
+export async function downloadFiles(fileId:string) {
 
-    return await api.get(`/api/storage/download?path=${encodeURIComponent(path)}`
+    return await api.get(`/api/storage/download?id=${encodeURIComponent(fileId)}`
     ).then((res)=>{
         return res.data;
     }).catch((error) => {

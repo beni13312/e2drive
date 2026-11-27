@@ -3,7 +3,6 @@ import db from "../database/connection.js"
 import * as argon2 from "argon2";
 import * as crypto from "node:crypto";
 import Config from "../config/config.js";
-import validateSession from "../middlewares/validateSession.js";
 
 const router = Router();
 
@@ -77,6 +76,7 @@ router.get("/logout", async (req, res) => {
         }).json({logout: true});
 
     }catch (error){
+        console.log(error);
         return res.status(500).json({error: "Failed to destroy session"});
     }
 })

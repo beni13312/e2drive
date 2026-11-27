@@ -268,7 +268,7 @@ function Files({encryptionKey, onReady, handleUpload, refreshTrigger, handleCrea
                                         }
                                     </td>
                                     <td className="py-1 border-b border-app-border px-4">{item.name}</td>
-                                    <td className="py-1 border-b border-app-border px-4">{item.size}B</td>
+                                    <td className="py-1 border-b border-app-border px-4 whitespace-nowrap">{item.size} B</td>
                                     <td className="py-1 border-b border-app-border px-4">{String(item.modDate).slice(0, 10).replaceAll('-', '.')}</td>
                                 </tr>
                             ))

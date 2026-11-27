@@ -1,6 +1,6 @@
 import Config from "../config/config.js";
 import path from "node:path";
-import {FileHandle, open, mkdir} from "node:fs/promises";
+import {FileHandle, open, mkdir, stat} from "node:fs/promises";
 
 export default class Filesystem {
   private file: FileHandle | null = null;
@@ -17,14 +17,25 @@ export default class Filesystem {
       const {bytesRead} = await this.file?.read(buffer, 0, length, position);
       return buffer.subarray(0, bytesRead);
   }
+
   public async write(bytes:Uint8Array){
     if(!this.file) throw new Error("file is not open");
     return this.file.write(bytes);
   }
+
   public async close(){
     if(!this.file) throw new Error("file is not open");
     await this.file.close();
     this.file = null;
+  }
+  public async isExists(filepath:string){
+    const validatedPath = this.validatePath(filepath);
+    try{
+      const stats = await stat(validatedPath);
+      return stats.isDirectory() || stats.isFile();
+    }catch (error){
+      return false;
+    }
   }
 
   public async mkdir(filepath:string){
@@ -34,10 +45,10 @@ export default class Filesystem {
   }
   private validatePath(requestedPath: string){
     const root = path.resolve(Config.DATA_STORAGE);
-    const target = path.resolve(root, path.join(root, requestedPath));
+    const target = path.resolve(requestedPath);
 
     if (target !== root && !target.startsWith(root + path.sep)){
-      return "";
+      throw Error(`Invalid storage path: ${root + path.sep}`);
     }
     return target;
   }

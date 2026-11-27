@@ -66,4 +66,5 @@ body {
     background-color: var(--color-app-bg);
     color: var(--color-app-text);
     user-select: none;
+    scrollbar-color: rgba(156, 163, 175, 0.4) transparent;
 }
